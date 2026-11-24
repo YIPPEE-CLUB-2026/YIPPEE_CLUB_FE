@@ -62,8 +62,10 @@ export function filterRecommendations(
         )) &&
       (!filters.materials.length ||
         (!!item.materials &&
-          item.materials.every((material) =>
-            filters.materials.includes(material),
+          filters.materials.every((material) =>
+            item.materials!.some((required) =>
+              required.replace(/^안전/, '') === material.replace(/^안전/, ''),
+            ),
           ))) &&
       (!filters.duration ||
         ((item.durationMin ?? item.duration) <= durationHigh &&

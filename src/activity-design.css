@@ -313,6 +313,13 @@
   object-fit: contain;
 }
 
+/* 표지 자체의 둥근 테두리를 유지하고 바깥 썸네일이 모서리를 자르지 않게 합니다. */
+.activity-card .activity-card__thumbnail:has(.lines-cover) {
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: 0;
+  background: transparent;
+}
 .lines-cover {
   position: relative;
   display: block;

@@ -1,3 +1,4 @@
+import { demoActivities } from '../data/demo-activities';
 import { Link } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import type { Activity } from '../types';
@@ -31,6 +32,8 @@ export function ActivityCard({
   showPreviewMeta = preview,
   saveIcon,
 }: ActivityCardProps) {
+  const demo = demoActivities.find((item) => item.id === activity.id);
+  const activityPath = detailTo || (demo ? `/activities/examples/${demo.slug}` : `/activities/${activity.id}`);
   const previewClick = preview
     ? (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
@@ -43,7 +46,7 @@ export function ActivityCard({
     >
       <Link
         className="activity-card__thumbnail"
-        to={preview ? '/login' : detailTo || `/activities/${activity.id}`}
+        to={preview ? '/login' : activityPath}
         onClick={previewClick}
         aria-label={`${activity.title} 상세 보기`}
       >
@@ -98,7 +101,7 @@ export function ActivityCard({
       )}
       <Link
         className="activity-card__title"
-        to={preview ? '/login' : detailTo || `/activities/${activity.id}`}
+        to={preview ? '/login' : activityPath}
         onClick={previewClick}
       >
         {!showPreviewMeta && <span>[{activity.subtitle}]</span>}
@@ -106,7 +109,7 @@ export function ActivityCard({
       </Link>
       <Link
         className="activity-card__price"
-        to={preview ? '/login' : detailTo || `/activities/${activity.id}`}
+        to={preview ? '/login' : activityPath}
         onClick={previewClick}
       >
         <strong>{activity.price.toLocaleString('ko-KR')}원</strong>

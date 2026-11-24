@@ -19,8 +19,8 @@ export const demoActivities: DemoActivity[] = [
     durationMax: 30,
     difficulty: 'easy',
     ageYears: 3,
-    ageMinMonths: 30,
-    ageMaxMonths: 35,
+    ageMinMonths: 36,
+    ageMaxMonths: 47,
     difficultyLabel: '하·중·상',
     description:
       '선의 생김새를 관찰하고 차이를 구분할 수 있어요. 손가락과 색연필로 선을 따라가고, 접거나 오리며 눈과 손의 협응과 소근육 조절 능력을 길러요.',
