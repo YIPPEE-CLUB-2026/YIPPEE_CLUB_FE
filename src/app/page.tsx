@@ -1,3 +1,5 @@
-export default function HomePage() {
-  return <main><h1>YIPPEE CLUB</h1></main>;
+import ClientApp from './client-app';
+
+export default function Page() {
+  return <ClientApp />;
 }

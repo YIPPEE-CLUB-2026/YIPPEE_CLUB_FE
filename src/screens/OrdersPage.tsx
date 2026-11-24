@@ -1,0 +1,117 @@
+import { useState } from 'react';
+import { ScreenHeader } from '../components/ScreenHeader';
+import { WireDialog } from '../components/WireDialog';
+import { Icon } from '../components/Icon';
+import { Link } from 'react-router-dom';
+import type { OrderSummary } from './OrderDetails';
+
+export function OrdersPage({ orders = [] }: { orders?: OrderSummary[] }) {
+  const [period, setPeriod] = useState('최근 3개월');
+  const [status, setStatus] = useState('전체');
+  const [choosing, setChoosing] = useState(false);
+  const filtered = orders.filter(
+    (order) =>
+      status === '전체' ||
+      (status === '취소' ? order.cancelled : !order.cancelled),
+  );
+  return (
+    <div
+      className="screen wire-orders"
+      data-figma-node={filtered.length ? '118:1255' : '118:1282'}
+    >
+      <ScreenHeader title="결제 내역" backTo="/profile" />
+      <div className="screen-content">
+        <div className="section-heading">
+          <span>{period}</span>
+          <button className="chip" onClick={() => setChoosing(true)}>
+            기간 <Icon name="down" size={16} />
+          </button>
+        </div>
+        <div className="chips" aria-label="결제 상태">
+          {['전체', '결제 완료', '취소'].map((value) => (
+            <button
+              key={value}
+              className={`chip ${status === value ? 'is-selected' : ''}`}
+              aria-pressed={status === value}
+              onClick={() => setStatus(value)}
+            >
+              {value}
+            </button>
+          ))}
+        </div>
+        {filtered.map((order) => (
+          <article className="order-summary" key={order.id}>
+            <div className="section-heading">
+              <small>{order.date}</small>
+              <span className="tag">
+                {order.cancelled ? '취소' : '결제 완료'}
+              </span>
+            </div>
+            <p>
+              {order.items[0]?.title}
+              {order.items.length > 1 ? ` 외 ${order.items.length - 1}개` : ''}
+            </p>
+            <strong>{order.total.toLocaleString('ko-KR')}원</strong>
+            <div className="order-summary__links">
+              <Link
+                className="button button--small"
+                to={`/orders/${encodeURIComponent(order.id)}/receipt`}
+                state={{ order }}
+              >
+                영수증
+              </Link>
+              <Link
+                className="button button--small"
+                to={`/orders/${encodeURIComponent(order.id)}`}
+                state={{ order }}
+              >
+                상세 보기
+              </Link>
+            </div>
+            {!order.cancelled && order.items[0] && (
+              <Link
+                className="button button--primary"
+                to={`/activities/${order.items[0].id}/reviews/new`}
+              >
+                리뷰 쓰기
+              </Link>
+            )}
+          </article>
+        ))}
+        {!filtered.length && (
+          <div className="wire-orders__empty">
+            <div className="empty-circle" />
+            <h2>아직 결제 내역이 없어요</h2>
+            <p>결제한 활동지가 여기에 표시돼요.</p>
+          </div>
+        )}
+      </div>
+      {choosing && (
+        <WireDialog title="조회 기간" sheet onClose={() => setChoosing(false)}>
+          <h2>조회 기간</h2>
+          <div className="sort-options">
+            {['최근 1개월', '최근 3개월', '최근 6개월', '최근 1년', '전체'].map(
+              (value) => (
+                <label key={value}>
+                  {value}
+                  <input
+                    type="radio"
+                    name="order-period"
+                    checked={period === value}
+                    onChange={() => setPeriod(value)}
+                  />
+                </label>
+              ),
+            )}
+          </div>
+          <button
+            className="button button--primary"
+            onClick={() => setChoosing(false)}
+          >
+            적용하기
+          </button>
+        </WireDialog>
+      )}
+    </div>
+  );
+}
