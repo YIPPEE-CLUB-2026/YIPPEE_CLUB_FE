@@ -1,0 +1,1611 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; font-src 'self' file:; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'"><title>YIPPEE CLUB · 관리자 UI 미리보기</title><style>:root {
+  --ink: #5d4534;
+  --muted: #9a8979;
+  --line: #eee6d9;
+  --paper: #fff;
+  --cream: #fffaf0;
+  --yellow: #ffda68;
+  --soft: #fff3ce;
+  --danger: #b24d43;
+  --green: #4e8064;
+  font-family: "Pretendard", "Malgun Gothic", Arial, sans-serif;
+  color: var(--ink);
+  background: #fcfaf6;
+  font-synthesis: none;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  cursor: pointer;
+  border: 0;
+  color: inherit;
+  background: none;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 3px solid #b58d35;
+  outline-offset: 3px;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+h1,
+h2,
+h3 {
+  letter-spacing: -0.04em;
+}
+input,
+textarea,
+select {
+  border: 1px solid #e5dccb;
+  border-radius: 10px;
+  background: #fff;
+  padding: 11px 13px;
+  min-width: 0;
+  color: var(--ink);
+}
+input::placeholder,
+textarea::placeholder {
+  color: #b1a395;
+}
+select {
+  cursor: pointer;
+}
+textarea {
+  resize: vertical;
+  line-height: 1.7;
+}
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 13px;
+  font-weight: 600;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+small {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 400;
+}
+fieldset {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+}
+legend {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 0 6px;
+}
+.primary,
+.secondary,
+.danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  min-height: 40px;
+  padding: 11px 17px;
+  white-space: nowrap;
+}
+.primary {
+  background: var(--yellow);
+  border: 1px solid #f7d064;
+}
+.primary:hover:not(:disabled) {
+  background: #ffd14a;
+}
+.secondary {
+  background: white;
+  border: 1px solid #e5dccf;
+}
+.secondary:hover:not(:disabled) {
+  background: var(--cream);
+}
+.danger {
+  border: 1px solid #eaccc6;
+  background: #fff4f1;
+  color: var(--danger);
+}
+.full {
+  width: 100%;
+}
+.compact {
+  min-height: 34px;
+  padding: 8px 12px;
+}
+.icon-button {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 9px;
+  font-size: 21px;
+}
+.icon-button:hover {
+  background: #f2ebdf;
+}
+.text-link {
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.text-link:hover {
+  text-decoration: underline;
+}
+.block {
+  display: block;
+  margin-top: 5px;
+}
+.mono {
+  font-family: ui-monospace, Consolas, monospace;
+}
+.muted {
+  color: var(--muted);
+  font-size: 13px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+.eyebrow {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.17em;
+  color: #aa8a4a;
+}
+.brand {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.07em;
+  line-height: 0.95;
+  display: block;
+  width: max-content;
+}
+.brand > span {
+  display: block;
+  letter-spacing: 0.09em;
+  font-size: 18px;
+  margin-top: 5px;
+}
+.brand > b {
+  display: block;
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  font-weight: 700;
+  color: #b69b67;
+  margin-top: 12px;
+}
+.console {
+  min-height: 100dvh;
+}
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 248px;
+  z-index: 20;
+  background: #fffdf8;
+  border-right: 1px solid var(--line);
+  padding: 34px 19px 0;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar > .brand {
+  margin-left: 14px;
+  margin-bottom: 33px;
+}
+.workspace {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 11px;
+  background: #f6f0e4;
+  border-radius: 12px;
+  margin-bottom: 18px;
+}
+.workspace-mark {
+  background: var(--yellow);
+  width: 31px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  font-weight: 900;
+  font-size: 19px;
+}
+.workspace strong {
+  font-size: 11px;
+  display: block;
+  letter-spacing: 0.02em;
+}
+.workspace small {
+  display: block;
+  font-size: 10px;
+  margin-top: 4px;
+}
+.live-dot,
+.connection i {
+  width: 6px;
+  height: 6px;
+  background: #80a589;
+  border-radius: 50%;
+  display: inline-block;
+}
+.workspace .live-dot {
+  margin-left: auto;
+}
+.sidebar nav {
+  overflow-y: auto;
+  flex: 1;
+  padding-bottom: 24px;
+}
+.nav-group {
+  font-size: 9px;
+  color: #b0a191;
+  letter-spacing: 0.12em;
+  font-weight: 800;
+  margin: 21px 12px 9px;
+}
+.nav-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 12px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+  margin: 3px 0;
+}
+.nav-item > span {
+  width: 20px;
+  font-size: 18px;
+  line-height: 1;
+  text-align: center;
+  color: #99856d;
+}
+.nav-item:hover {
+  background: #f8f1e4;
+}
+.nav-item.active {
+  background: #ffe9a1;
+  color: #614728;
+  font-weight: 800;
+}
+.nav-item.active > span {
+  color: #87621f;
+}
+.nav-item small {
+  font-size: 8px;
+  padding: 3px 5px;
+  background: #f0ece4;
+  border-radius: 4px;
+  margin-left: auto;
+  color: #a99a89;
+}
+.sidebar-bottom {
+  padding: 19px 3px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #f4dfac;
+  font-size: 14px;
+  font-weight: 800;
+}
+.sidebar-bottom > div {
+  min-width: 0;
+  flex: 1;
+}
+.sidebar-bottom strong {
+  font-size: 11px;
+}
+.sidebar-bottom small {
+  font-size: 9px;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 4px;
+}
+.main-shell {
+  margin-left: 248px;
+}
+.topbar {
+  height: 74px;
+  background: rgb(255 255 255 / 75%);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 38px;
+}
+.topbar > div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.breadcrumb {
+  font-size: 11px;
+  color: #9e8f7f;
+}
+.breadcrumb b {
+  margin: 0 13px;
+  color: #d8cbbb;
+  font-weight: 400;
+}
+.topbar-right {
+  font-size: 10px;
+  color: var(--muted);
+}
+.connection {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  padding: 7px 10px;
+  color: #798c76;
+}
+.topbar-date {
+  border-left: 1px solid var(--line);
+  padding-left: 16px;
+}
+.content {
+  max-width: 1500px;
+  margin: auto;
+  padding: 35px 38px 0;
+}
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 27px;
+  gap: 16px;
+}
+.page-heading h1 {
+  font-size: 27px;
+  line-height: 1.5;
+  margin-top: 6px;
+  font-weight: 800;
+}
+.heading-dot {
+  color: #d8aa37;
+  margin-left: 3px;
+}
+.page-heading p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.page-heading > .secondary {
+  font-size: 11px;
+  background: #fffdf8;
+}
+.welcome-banner {
+  background: #ffe391;
+  border: 1px solid #f7d778;
+  border-radius: 21px;
+  min-height: 211px;
+  padding: 27px 33px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 23px;
+}
+.welcome-banner .eyebrow {
+  color: #a0782a;
+  font-size: 9px;
+}
+.welcome-banner h2 {
+  font-size: 25px;
+  line-height: 1.45;
+  margin: 11px 0 9px;
+  font-weight: 800;
+}
+.welcome-banner p {
+  font-size: 11px;
+  color: #a1844b;
+}
+.welcome-banner button {
+  display: flex;
+  gap: 24px;
+  margin-top: 21px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #fff9e8;
+  padding: 9px 13px;
+  border-radius: 8px;
+}
+.banner-art {
+  width: 210px;
+  align-self: stretch;
+  position: relative;
+  flex-shrink: 0;
+  margin-right: 25px;
+}
+.art-circle {
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e8bd55;
+  background: #fff3c8;
+  border-radius: 44% 56% 59% 41%;
+  transform: rotate(-12deg);
+  font-size: 54px;
+  font-weight: 900;
+  right: 18px;
+  top: 12px;
+  box-shadow: 10px 15px 0 #f5cf72;
+}
+.art-spark {
+  position: absolute;
+  left: 0;
+  bottom: 13px;
+  z-index: 1;
+  font-size: 66px;
+  color: #fff9e8;
+  transform: rotate(12deg);
+  text-shadow: 0 2px #c9a13f;
+}
+.art-small {
+  position: absolute;
+  right: -11px;
+  top: -2px;
+  color: #fff9e8;
+  font-size: 40px;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: white;
+  border: 1px solid var(--line);
+  padding: 20px 22px;
+  border-radius: 15px;
+  text-align: left;
+  box-shadow: 0 3px 15px #84633b03;
+  transition:
+    transform 0.15s,
+    border-color 0.15s;
+}
+.stat-card:hover {
+  transform: translateY(-2px);
+  border-color: #e8ce90;
+}
+.stat-card > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+}
+.stat-card i {
+  width: 31px;
+  height: 31px;
+  border-radius: 9px;
+  background: #fff4d7;
+  display: grid;
+  place-items: center;
+  font-style: normal;
+  font-size: 18px;
+  color: #b88d31;
+}
+.stat-card > strong {
+  display: block;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.05em;
+  margin-top: 13px;
+}
+.stat-card strong small {
+  font-size: 11px;
+  margin-left: 7px;
+  letter-spacing: 0;
+}
+.stat-card > p {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 18px;
+  display: flex;
+  justify-content: space-between;
+}
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 23px;
+}
+.panel {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  margin-bottom: 23px;
+  overflow: hidden;
+}
+.panel-heading {
+  padding: 23px 24px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.panel-heading h2 {
+  font-size: 16px;
+  font-weight: 800;
+}
+.panel-heading p {
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-top: 7px;
+}
+.panel-heading select {
+  font-size: 11px;
+  max-width: 180px;
+}
+.subtle-pill {
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  background: #faf6ed;
+  border: 1px solid #eee6d9;
+  border-radius: 6px;
+  color: #ac987a;
+  padding: 6px 8px;
+}
+.todo {
+  display: flex;
+  width: calc(100% - 48px);
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  padding: 17px 0;
+  border-top: 1px solid #f2ece3;
+  margin: 0 24px;
+}
+.todo-icon {
+  background: #fff2cc;
+  width: 35px;
+  height: 35px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: #b68b31;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.todo-icon.soft {
+  background: #f4f0e9;
+  color: #a69683;
+}
+.todo > div {
+  flex: 1;
+}
+.todo strong {
+  font-size: 11px;
+}
+.todo p {
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.todo > b {
+  font-size: 20px;
+  margin-right: 10px;
+}
+.todo > span:last-child {
+  color: #ab9c85;
+}
+.todo:last-child {
+  padding-bottom: 23px;
+}
+.pending-metrics {
+  padding: 0 24px;
+}
+.pending-metrics > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #f2ece3;
+  padding: 16px 0;
+  font-size: 11px;
+  gap: 12px;
+}
+.pending-metrics b {
+  font-size: 9px;
+  background: #f5f3ee;
+  color: #ad9e8a;
+  padding: 5px 8px;
+  border-radius: 5px;
+  font-weight: 500;
+}
+.panel-note {
+  font-size: 10px;
+  line-height: 1.8;
+  color: #a4937e;
+  padding: 0 24px 20px;
+}
+.table-wrap {
+  overflow: auto;
+  width: 100%;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 11px;
+  white-space: nowrap;
+  text-align: left;
+}
+th {
+  font-weight: 500;
+  color: #aa9983;
+  background: #fcfaf5;
+  padding: 13px 24px;
+  font-size: 10px;
+  border-top: 1px solid #f3ede3;
+  border-bottom: 1px solid #f0e8db;
+}
+td {
+  padding: 17px 24px;
+  border-bottom: 1px solid #f4efe6;
+  color: #88715c;
+}
+td strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+tbody tr:hover {
+  background: #fffdf8;
+}
+.truncate {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.status {
+  font-size: 9px;
+  display: inline-block;
+  padding: 6px 9px;
+  border-radius: 6px;
+  background: #f2eee8;
+  color: #a18f77;
+  white-space: nowrap;
+}
+.status-paid,
+.status-approved {
+  background: #edf5e9;
+  color: #64825b;
+}
+.status-review,
+.status-requested,
+.status-pending,
+.status-processing {
+  background: #fff2cf;
+  color: #b08b37;
+}
+.status-failed,
+.status-rejected {
+  background: #fbece8;
+  color: #b37465;
+}
+.status-refunded,
+.status-cancelled {
+  background: #f1eeee;
+  color: #928582;
+}
+.empty {
+  min-height: 212px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 30px 24px;
+}
+.empty > span {
+  width: 50px;
+  height: 50px;
+  background: #faf5ea;
+  border: 1px solid #f0e5cf;
+  border-radius: 17px;
+  display: grid;
+  place-items: center;
+  color: #baa77e;
+  font-size: 26px;
+  margin-bottom: 17px;
+}
+.empty h3 {
+  font-size: 13px;
+}
+.empty p {
+  font-size: 10px;
+  line-height: 1.9;
+  color: #ad9b87;
+  margin-top: 8px;
+  max-width: 420px;
+}
+.notice {
+  padding: 14px 17px;
+  border: 1px solid #eadbb4;
+  background: #fff8e5;
+  border-radius: 10px;
+  font-size: 11px;
+  line-height: 1.8;
+  color: #9c824d;
+  margin-bottom: 20px;
+}
+.notice.error {
+  border-color: #eccbc2;
+  background: #fff5f1;
+  color: #a56354;
+}
+.panel > .notice {
+  margin: 0 24px 20px;
+}
+.loading {
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.loading > span {
+  width: 15px;
+  height: 15px;
+  border: 2px solid #eee2c5;
+  border-top-color: #c6a85f;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  padding: 18px 24px;
+  border-top: 1px solid var(--line);
+}
+.pagination > span {
+  font-size: 10px;
+  color: var(--muted);
+  margin-right: auto;
+}
+.search-form {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  padding: 0 24px 22px;
+}
+.search-form input {
+  flex: 1;
+  font-size: 12px;
+  width: 100%;
+}
+.product-searches {
+  display: flex;
+  gap: 12px;
+  padding: 0 24px 22px;
+}
+.product-searches .search-form {
+  padding: 0;
+  flex: 1;
+}
+.product-searches .by-id {
+  max-width: 245px;
+}
+.product-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.product-cell > img {
+  width: 42px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 7px;
+  background: #f6f0e4;
+}
+.product-cell strong {
+  display: block;
+  max-width: 240px;
+  white-space: normal;
+  line-height: 1.7;
+}
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  padding: 0 24px 24px;
+}
+.category-grid > div {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.category-grid span {
+  font-size: 19px;
+  color: #b59143;
+}
+.category-grid strong {
+  font-size: 12px;
+}
+.category-grid small {
+  margin-left: auto;
+  font-size: 9px;
+}
+.member-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 24px;
+  border-top: 1px solid var(--line);
+}
+.avatar.large {
+  width: 52px;
+  height: 52px;
+  font-size: 22px;
+}
+.member-card h3 {
+  font-size: 18px;
+}
+.member-card p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.member-card > .status {
+  margin-left: auto;
+}
+.panel > .danger,
+.panel > .primary {
+  margin: 0 24px 24px;
+}
+.details {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  font-size: 12px;
+  line-height: 1.8;
+  margin: 0;
+  padding: 0 24px 24px;
+  gap: 0;
+}
+.details dt,
+.details dd {
+  padding: 12px 0;
+  margin: 0;
+  border-bottom: 1px solid var(--line);
+  overflow-wrap: anywhere;
+}
+.details dt {
+  color: var(--muted);
+}
+.details dd {
+  font-weight: 500;
+}
+.detail-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.detail-summary strong {
+  font-size: 26px;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 22px 0 0;
+}
+.modal {
+  width: min(520px, calc(100vw - 32px));
+  border: 1px solid #e9dfcd;
+  padding: 26px;
+  border-radius: 20px;
+  background: #fffefa;
+  color: var(--ink);
+  max-height: calc(100dvh - 48px);
+  overflow: auto;
+  box-shadow: 0 25px 100px #51381f20;
+}
+.modal.wide {
+  width: min(850px, calc(100vw - 32px));
+}
+.modal::backdrop {
+  background: #564a3e66;
+  backdrop-filter: blur(3px);
+}
+.modal:not([open]) {
+  display: none;
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 23px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 17px;
+}
+.modal-header h2 {
+  font-size: 20px;
+}
+.modal-description {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--muted);
+  margin-bottom: 22px;
+}
+.modal .details {
+  padding: 0;
+  margin-bottom: 22px;
+}
+.modal h3 {
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+.modal th,
+.modal td {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.modal .notice {
+  margin: 16px 0;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.check {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 400;
+}
+.check input {
+  accent-color: #d7ac3f;
+}
+.checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.unsupported {
+  font-size: 12px;
+  border: 1px dashed #e4d8bf;
+  border-radius: 10px;
+  padding: 14px;
+  color: #a58e6a;
+}
+.unsupported summary {
+  cursor: pointer;
+}
+.unsupported p {
+  margin-top: 12px;
+  line-height: 1.9;
+}
+.module-tabs {
+  display: flex;
+  gap: 22px;
+  border-bottom: 1px solid var(--line);
+  padding: 0 24px;
+}
+.module-tabs > span {
+  padding: 13px 0;
+  font-size: 11px;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+}
+.module-tabs > span.selected {
+  color: #9a762e;
+  font-weight: 700;
+  border-color: #e4bd56;
+}
+.roadmap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+.roadmap {
+  border: 1px solid var(--line);
+  background: #fffdf8;
+  border-radius: 15px;
+  padding: 24px;
+}
+.roadmap > span {
+  font-size: 24px;
+  letter-spacing: -0.05em;
+  color: #cfb988;
+  font-weight: 800;
+}
+.roadmap h3 {
+  font-size: 13px;
+  margin: 12px 0 9px;
+}
+.roadmap p {
+  font-size: 10px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+.roadmap small {
+  display: inline-block;
+  font-size: 9px;
+  background: #f4ecda;
+  color: #ad9670;
+  padding: 5px 8px;
+  border-radius: 5px;
+  margin-top: 16px;
+}
+.integration-list {
+  padding: 0 24px;
+}
+.integration-list > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+  gap: 15px;
+}
+.integration-list strong {
+  font-size: 12px;
+}
+.integration-list p {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 7px;
+}
+footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 25px 0;
+  border-top: 1px solid var(--line);
+  font-size: 9px;
+  letter-spacing: 0.03em;
+  color: #b5a794;
+  margin-top: 32px;
+}
+.mobile-menu {
+  display: none;
+}
+.sidebar-shade {
+  display: none;
+}
+.auth-shell {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.auth-story {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #ffe08a;
+  padding: 55px 60px;
+}
+.auth-story .brand b {
+  color: #a38442;
+}
+.auth-story h1 {
+  font-size: clamp(34px, 4vw, 58px);
+  line-height: 1.35;
+  margin: 22px 0;
+  font-weight: 800;
+}
+.auth-story p {
+  font-size: 13px;
+  line-height: 1.9;
+  color: #a28349;
+}
+.auth-story > div {
+  z-index: 1;
+}
+.auth-orbit {
+  position: absolute;
+  right: -80px;
+  bottom: 65px;
+  font-size: 430px;
+  line-height: 1;
+  color: #ffe9aa;
+  transform: rotate(-13deg);
+}
+.auth-story .auth-foot {
+  font-size: 10px;
+  z-index: 1;
+}
+.auth-form {
+  display: grid;
+  place-items: center;
+  background: #fffdf8;
+  padding: 40px;
+}
+.auth-card {
+  width: min(100%, 360px);
+}
+.auth-card > h2 {
+  font-size: 30px;
+  margin: 13px 0;
+}
+.auth-card > p {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.9;
+  margin-bottom: 28px;
+}
+.auth-card form {
+  gap: 24px;
+}
+.auth-card label {
+  font-size: 12px;
+}
+.auth-card input {
+  padding: 14px;
+  background: white;
+}
+.auth-card button.full {
+  margin-top: 6px;
+  min-height: 48px;
+}
+.auth-card .auth-caption {
+  font-size: 10px;
+  line-height: 2;
+  margin-top: 25px;
+  color: #b6a58b;
+}
+.auth-card > .notice {
+  font-size: 11px;
+}
+@media (min-width: 1600px) {
+  .content {
+    padding: 45px 55px 0;
+  }
+  .topbar {
+    padding: 0 55px;
+  }
+  .welcome-banner {
+    min-height: 235px;
+  }
+  .welcome-banner h2 {
+    font-size: 29px;
+  }
+  .stats-grid {
+    gap: 24px;
+  }
+  .dashboard-grid {
+    gap: 24px;
+  }
+}
+@media (max-width: 1150px) {
+  .sidebar {
+    width: 224px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .main-shell {
+    margin-left: 224px;
+  }
+  .content {
+    padding: 27px 24px 0;
+  }
+  .topbar {
+    padding: 0 24px;
+  }
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  .topbar-date {
+    display: none;
+  }
+  .category-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .stat-card {
+    padding: 17px;
+  }
+  .product-searches {
+    flex-direction: column;
+  }
+  .product-searches .by-id {
+    max-width: none;
+  }
+  .banner-art {
+    width: 160px;
+    margin-right: 0;
+  }
+  .roadmap-grid {
+    gap: 12px;
+  }
+  .roadmap {
+    padding: 19px;
+  }
+}
+@media (max-width: 760px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.2s;
+    width: 248px;
+  }
+  .sidebar.is-open {
+    transform: translateX(0);
+  }
+  .sidebar-shade {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: #4b3a2860;
+    z-index: 19;
+  }
+  .main-shell {
+    margin-left: 0;
+  }
+  .mobile-menu {
+    display: inline-grid;
+  }
+  .topbar {
+    height: 63px;
+    padding: 0 18px;
+  }
+  .topbar > div {
+    gap: 7px;
+  }
+  .topbar-right .connection {
+    font-size: 8px;
+    padding: 6px;
+  }
+  .breadcrumb {
+    font-size: 10px;
+  }
+  .breadcrumb b {
+    margin: 0 6px;
+  }
+  .content {
+    padding: 25px 18px 0;
+  }
+  .page-heading h1 {
+    font-size: 24px;
+  }
+  .page-heading > .secondary {
+    padding: 9px;
+    min-height: 34px;
+    font-size: 10px;
+  }
+  .page-heading p {
+    font-size: 10px;
+    max-width: 230px;
+    line-height: 1.8;
+  }
+  .welcome-banner {
+    padding: 23px;
+    min-height: 211px;
+  }
+  .welcome-banner h2 {
+    font-size: 22px;
+  }
+  .welcome-banner p {
+    max-width: 195px;
+    font-size: 10px;
+    line-height: 1.8;
+  }
+  .banner-art {
+    width: 90px;
+    opacity: 0.85;
+  }
+  .art-circle {
+    width: 87px;
+    height: 87px;
+    font-size: 40px;
+    right: -18px;
+    top: 30px;
+  }
+  .art-spark {
+    font-size: 44px;
+    left: -8px;
+    bottom: 18px;
+  }
+  .art-small {
+    font-size: 24px;
+    right: 0;
+    top: 5px;
+  }
+  .stats-grid {
+    gap: 8px;
+  }
+  .stat-card {
+    padding: 13px 10px;
+    border-radius: 12px;
+  }
+  .stat-card > div {
+    font-size: 10px;
+    gap: 5px;
+  }
+  .stat-card i {
+    display: none;
+  }
+  .stat-card > strong {
+    font-size: 29px;
+  }
+  .stat-card > p {
+    font-size: 8px;
+    line-height: 1.8;
+    min-height: 28px;
+    align-items: end;
+    margin-top: 12px;
+  }
+  .stat-card strong small {
+    font-size: 9px;
+    margin-left: 4px;
+  }
+  .stat-card p > span {
+    display: none;
+  }
+  .panel-heading {
+    padding: 20px 17px;
+  }
+  .panel-heading h2 {
+    font-size: 15px;
+  }
+  .panel-heading p {
+    font-size: 9px;
+  }
+  .panel-heading > .primary {
+    font-size: 10px;
+    padding: 9px;
+  }
+  .todo {
+    width: calc(100% - 34px);
+    margin: 0 17px;
+  }
+  .todo p {
+    font-size: 8px;
+  }
+  .todo strong {
+    font-size: 10px;
+  }
+  .todo > div {
+    min-width: 0;
+  }
+  .todo-icon {
+    width: 30px;
+    height: 30px;
+  }
+  .pending-metrics {
+    padding: 0 17px;
+  }
+  .roadmap-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .search-form {
+    padding: 0 17px 18px;
+    gap: 6px;
+  }
+  .search-form .primary,
+  .search-form .secondary {
+    font-size: 10px;
+    padding: 10px;
+  }
+  .category-grid {
+    grid-template-columns: 1fr;
+    padding: 0 17px 20px;
+  }
+  .details {
+    grid-template-columns: 110px 1fr;
+    padding: 0 17px 20px;
+    font-size: 11px;
+  }
+  .product-searches {
+    padding: 0 17px 20px;
+  }
+  .modal {
+    padding: 20px;
+  }
+  .modal-header h2 {
+    font-size: 18px;
+  }
+  .module-tabs {
+    gap: 16px;
+    padding: 0 17px;
+    overflow: auto;
+  }
+  .module-tabs > span {
+    font-size: 10px;
+    white-space: nowrap;
+  }
+  .auth-shell {
+    grid-template-columns: 1fr;
+  }
+  .auth-story {
+    padding: 25px 28px;
+    min-height: 240px;
+  }
+  .auth-story .brand {
+    font-size: 21px;
+  }
+  .auth-story .brand > span {
+    font-size: 14px;
+  }
+  .auth-story .brand > b {
+    font-size: 7px;
+    margin-top: 9px;
+  }
+  .auth-story h1 {
+    font-size: 28px;
+    margin: 17px 0 0;
+  }
+  .auth-story > div > .eyebrow,
+  .auth-story > div > p,
+  .auth-story .auth-foot {
+    display: none;
+  }
+  .auth-orbit {
+    font-size: 230px;
+    right: -22px;
+    bottom: -47px;
+  }
+  .auth-form {
+    padding: 35px 28px 50px;
+  }
+  .auth-card > h2 {
+    font-size: 26px;
+  }
+  footer {
+    gap: 20px;
+    font-size: 8px;
+    line-height: 1.8;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+@font-face {
+  font-family: "Pretendard";
+  src: url("./fonts/PretendardVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+.sidebar-shade{display:none}.preview-label{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);z-index:100;background:#5d4534;color:#fff4d3;border:1px solid #856a4c;padding:9px 17px;border-radius:30px;font-size:10px;white-space:nowrap;box-shadow:0 4px 20px #5d453425;pointer-events:none}.mini-cover{display:grid;place-items:center;width:42px;height:48px;border-radius:8px;background:#fff0ba;border:1px solid #e7d49c;font-size:24px}.review-layout{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:0 24px 24px}.photo-demo{min-height:320px;background:#f7f1e6;border-radius:15px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:15px;padding:25px;border:1px dashed #d8c8a9}.sample-paper{transform:rotate(-4deg);background:white;box-shadow:0 8px 20px #67503a13;width:190px;padding:25px 18px;color:#8d7963;border:1px solid #e8decb;text-align:center}.sample-paper h3{margin:10px 0 18px;font-size:14px}.paper-lines{font-size:28px;line-height:1.9;color:#c9b08d;letter-spacing:5px}.sample-paper small{font-size:8px}.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:15px 0}.result-grid>div{background:#faf7ef;border:1px solid var(--line);border-radius:10px;padding:14px}.result-grid small{display:block;margin-bottom:9px}.result-grid strong{font-size:13px}.toast{position:fixed;right:25px;top:24px;z-index:120;background:#5d4534;color:white;padding:15px 22px;border-radius:12px;font-size:12px;box-shadow:0 8px 30px #5d453425}.demo-metrics{margin-bottom:0}.demo-metrics .stat-card{cursor:default}.filter-buttons{display:flex;gap:8px;padding:0 24px 20px;flex-wrap:wrap}.filter-buttons button{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:8px 13px}.filter-buttons button.active{background:var(--yellow);border-color:#e8c364}.progress-bar{height:7px;border-radius:8px;background:#f0e8d7;overflow:hidden;margin-top:13px}.progress-bar>span{display:block;height:100%;background:#e3bb51}.login-note{padding:12px 14px;background:#fff4d4;border-radius:9px;margin-bottom:25px;font-size:11px;line-height:1.8;color:#a0833f}@media(max-width:760px){.review-layout{grid-template-columns:1fr}.preview-label{font-size:8px;padding:8px 12px}.photo-demo{min-height:270px}.demo-metrics .stat-card strong{font-size:23px}}
+.plain-login{min-height:100dvh;display:grid;place-items:center;background:#faf9f6;padding:24px}.plain-login-card{width:min(100%,360px)}.plain-wordmark{font-size:17px;font-weight:800;letter-spacing:-.04em;margin-bottom:38px}.plain-login h1{font-size:24px;font-weight:700}.plain-login p{font-size:13px;color:#8c8173;margin:12px 0 28px;line-height:1.7}.plain-login input{min-height:46px}.plain-login form{gap:22px}.plain-login .primary{margin-top:6px;min-height:46px}.sidebar{background:#fffdf8}.brand{font-size:19px;letter-spacing:-.04em;line-height:1.4}.brand small{display:block;font-size:11px;color:#96856e;margin-top:7px;font-weight:500;letter-spacing:0}.sidebar>.brand{margin-bottom:25px}.workspace{display:none}.nav-item{font-size:13px;padding:13px 12px;gap:0}.nav-item>span{display:none}.nav-item.active{background:#fff0bb;font-weight:650}.nav-group{font-size:11px;letter-spacing:0;font-weight:500;margin-top:24px}.content{padding-top:32px}.page-heading{margin-bottom:30px}.page-heading h1{font-size:25px;font-weight:700;margin:0}.page-heading p{font-size:13px;margin-top:9px;color:#968a7b}.panel,.stat-card{border-radius:9px;box-shadow:none}.stats-grid{gap:16px}.stat-card{padding:22px}.stat-card>div{font-size:13px;font-weight:500;color:#8b7c69}.stat-card>strong{font-size:31px;line-height:1.3;margin-top:14px;font-weight:650}.stat-card:hover{transform:none}.panel-heading h2{font-size:16px;font-weight:650}.panel-heading p{font-size:12px}.panel-heading{padding-top:21px;padding-bottom:21px}.todo{padding:20px 0;gap:16px}.todo strong{font-size:13px;font-weight:600}.todo p{font-size:11px}.todo>b{font-size:19px;font-weight:600}.pending-metrics>div{font-size:12px;padding:17px 0}.pending-metrics b{background:none;font-size:12px;font-weight:600;color:#735f46;padding:0}.panel-note{font-size:11px}.table-wrap table{font-size:12px}th{font-size:11px;background:#faf8f3;font-weight:500}td{padding-top:18px;padding-bottom:18px}.status{border-radius:4px;font-size:10px}.primary,.secondary,.danger{border-radius:7px;font-size:12px}.topbar{background:#fffefb}.topbar-right .connection{border:0;padding:0;font-size:11px;color:#9d927f}.eyebrow,.subtle-pill{display:none}.preview-label{background:#fffdf7;color:#99866a;border-color:#e2d8c4;box-shadow:none;border-radius:6px;font-size:10px;padding:7px 12px}footer{font-size:10px}.mini-cover{border-radius:5px;font-size:20px;background:#f5edd6}.auth-orbit,.banner-art{display:none}@media(max-width:760px){.stat-card{padding:16px 12px}.stat-card>div{font-size:11px}.stat-card>strong{font-size:27px}.page-heading p{font-size:12px}.nav-item{font-size:13px}.panel-heading p{font-size:11px}}
+</style></head><body><div id="app"></div><div class="preview-label">UI 미리보기 · 모든 데이터는 예시이며 실제 처리는 발생하지 않습니다</div><dialog id="modal" class="modal wide"></dialog><script>
+'use strict';
+const app=document.getElementById('app'),modal=document.getElementById('modal');
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const won=v=>Number(v).toLocaleString('ko-KR')+'원';
+const menus=[['overview','◫','운영 대시보드','OVERVIEW'],['products','▤','학습지 관리','콘텐츠'],['categories','⊞','카테고리 관리',''],['downloads','↓','다운로드 · 발급 이력',''],['challenges','◎','도전과제 인증 검수','검수'],['orders','▣','주문 · 결제 관리','운영'],['refunds','↶','환불 요청',''],['members','♧','회원 관리',''],['support','☷','문의 · 프로모션',''],['settings','⚙','설정 · 연동 현황','시스템']];
+let section='overview',name='미리보기 관리자',logged=false,filter='',productQuery='';
+let products=[{id:103,title:'실선이랑 점선이랑',age:'36~47개월',price:1900,rental:700,status:'공개',icon:'✂'},{id:102,title:'나만의 퍼즐 만들기',age:'36~47개월',price:990,rental:300,status:'공개',icon:'✳'},{id:101,title:'어디서 탈까요?',age:'36~47개월',price:1900,rental:null,status:'비공개',icon:'✦'}];
+let categories=['미술 놀이','신체 · 소근육','자연탐구','언어 · 인지','만들기','탈것'];
+let orders=[{id:1031,user:'샘플 회원 A',amount:2600,status:'paid',title:'실선이랑 점선이랑 외 1건',time:'2026. 11. 25. 09:32'},{id:1030,user:'샘플 회원 B',amount:1900,status:'review',title:'어디서 탈까요?',time:'2026. 11. 25. 09:15'},{id:1029,user:'샘플 회원 C',amount:990,status:'pending',title:'나만의 퍼즐 만들기',time:'2026. 11. 25. 08:54'},{id:1028,user:'샘플 회원 D',amount:1900,status:'refunded',title:'실선이랑 점선이랑',time:'2026. 11. 24. 17:40'}];
+let reviews=[{id:31,member:'샘플 회원 A',code:'CS05-9K4M-7P2X',confidence:'높음 · 98%',matched:true,filled:true,status:'검수 대기'},{id:30,member:'샘플 회원 B',code:'CS05-2H7F-8A1Q',confidence:'낮음 · 62%',matched:true,filled:true,status:'AI 확인 필요'},{id:29,member:'샘플 회원 C',code:'인식 불가',confidence:'낮음 · 31%',matched:false,filled:false,status:'반려'}];
+const labels={paid:'결제 완료',pending:'결제 대기',review:'확인 필요',refunded:'환불 완료',requested:'검토 대기',approved:'승인',rejected:'반려'};
+const badge=s=>'<span class="status status-'+esc(s)+'">'+esc(labels[s]||s)+'</span>';
+const brand='<a class="brand" href="#" data-nav="overview">YIPPEE<span>CLUB</span><b>OPERATIONS</b></a>';
+const panel=(title,desc,body,action='')=>'<section class="panel"><div class="panel-heading"><div><h2>'+title+'</h2><p>'+desc+'</p></div>'+action+'</div>'+body+'</section>';
+const btn=(label,action,id='',cls='secondary')=>'<button class="'+cls+'" data-action="'+action+'" data-id="'+esc(id)+'">'+label+'</button>';
+function toast(text){document.querySelector('.toast')?.remove();const t=document.createElement('div');t.className='toast';t.setAttribute('role','status');t.textContent=text;document.body.appendChild(t);setTimeout(()=>t.remove(),2800);}
+function openModal(title,body){modal.innerHTML='<div class="modal-header"><h2>'+esc(title)+'</h2><button class="icon-button" data-action="close" aria-label="닫기">×</button></div>'+body;if(!modal.open)modal.showModal();}
+function login(){app.innerHTML='<main class="auth-shell"><div class="auth-story">'+brand+'<div><span class="eyebrow">SMALL PLAY, BIG GROWTH.</span><h1>작은 놀이를<br>큰 성장으로.</h1><p>아이들의 즐거운 시작을 만드는<br>운영자들의 공간입니다.</p></div><span class="auth-orbit" aria-hidden="true">✳</span><p class="auth-foot">YIPPEE CLUB · 관리자 UI 미리보기</p></div><div class="auth-form"><div class="auth-card"><span class="eyebrow">ADMIN UI PREVIEW</span><h2>운영자 로그인</h2><p>YIPPEE CLUB 관리자 화면을 둘러보세요.</p><div class="login-note">아무 아이디와 비밀번호나 입력하면 입장합니다.<br>실제 계정이나 비밀번호는 입력하지 마세요.</div><form id="login"><label>아이디<input name="name" placeholder="아무거나 입력하세요" autocomplete="off" required></label><label>비밀번호<input name="password" type="password" autocomplete="off" placeholder="아무거나 입력하세요" required></label><button class="primary full">미리보기 시작하기 →</button></form><p class="auth-caption">백엔드 연결이 없는 독립 HTML 미리보기입니다.<br>입력한 비밀번호는 저장하거나 전송하지 않습니다.</p></div></div></main>';}
+function table(headers,rows){return '<div class="table-wrap"><table><thead><tr>'+headers.map(v=>'<th>'+v+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(v=>'<td>'+v+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';}
+function orderTable(){return table(['주문 번호','회원','결제 금액','상태','주문 시각','관리'],orders.filter(o=>!filter||o.status===filter).map(o=>['<b class="mono">#'+o.id+'</b>',o.user,won(o.amount),badge(o.status),o.time,btn('상세 ↗','order',o.id,'text-link')]));}
+function dashboard(){const stats=[['결제 확인 필요','1','결제사 상태를 확인해 주세요','orders','↻'],['환불 검토 대기','2','고객의 요청을 기다리고 있어요','refunds','↶'],['사진 인증 대기','3','오늘의 놀이 기록을 확인하세요','challenges','◎']];return '<section class="welcome-banner"><div><span class="eyebrow">LET’S MAKE A GOOD DAY</span><h2>오늘도 즐거운 놀이를<br>함께 만들어 볼까요?</h2><p>한 번의 꼼꼼한 확인이, 가족의 좋은 경험이 됩니다.</p><button data-nav="products">학습지 관리하기 <span>↗</span></button></div><div class="banner-art" aria-hidden="true"><span class="art-spark">✳</span><span class="art-circle">Y!</span><span class="art-small">✦</span></div></section><div class="stats-grid">'+stats.map(s=>'<button class="stat-card" data-nav="'+s[3]+'"><div><span>'+s[0]+'</span><i>'+s[4]+'</i></div><strong>'+s[1]+'<small>건</small></strong><p>'+s[2]+'<span>→</span></p></button>').join('')+'</div><div class="dashboard-grid">'+panel('먼저 확인할 일','오늘의 운영 체크리스트 · 예시 데이터', [['사진 인증 검수','아이들의 놀이 사진을 확인하고 피드백해 주세요.','3','challenges','◎'],['환불 요청 검토','다운로드 기록과 환불 고지 동의를 확인하세요.','2','refunds','↶'],['결제 상태 확인','확인이 필요한 주문을 다시 대조하세요.','1','orders','↻']].map(s=>'<button class="todo" data-nav="'+s[3]+'"><span class="todo-icon">'+s[4]+'</span><div><strong>'+s[0]+'</strong><p>'+s[1]+'</p></div><b>'+s[2]+'</b><span>→</span></button>').join(''),'<span class="subtle-pill">TO-DO</span>')+panel('한눈에 보는 서비스','운영 지표의 배치 예시입니다.','<div class="pending-metrics"><div><span>이번 달 매출</span><b>128,400원 · 예시</b></div><div><span>다운로드</span><b>84회 · 예시</b></div><div><span>도전과제 달성률</span><b>72% · 예시</b></div><div><span>AI 자동 판정 비율</span><b>86% · 예시</b></div></div><p class="panel-note">실제 집계값이 아닙니다. 화면 확인에만 사용하세요.</p>','<span class="subtle-pill">SAMPLE</span>')+'</div>'+panel('최근 주문','고객의 새로운 놀이 시작을 확인하세요. · 예시',orderTable(),'<button class="text-link" data-nav="orders">전체 보기 →</button>');}
+function productList(){const body='<form id="product-search" class="search-form"><input name="q" placeholder="학습지 제목 검색" value="'+esc(productQuery)+'"><button class="secondary">검색</button></form>'+table(['학습지','권장 연령','소장 가격','7일 이용권','노출 상태','관리'],products.filter(p=>p.title.includes(productQuery)).map(p=>['<div class="product-cell"><span class="mini-cover">'+p.icon+'</span><div><strong>'+esc(p.title)+'</strong><small class="block">ID '+p.id+'</small></div></div>',p.age,won(p.price),p.rental?won(p.rental):'미판매',badge(p.status),btn('수정 ↗','product',p.id,'text-link')]));return panel('학습지 목록','마스터 PDF와 표지, 판매 가격을 관리합니다. · 예시',body,btn('+ 새 학습지 등록','product','new','primary'));}
+function challengeList(){return panel('도전과제 인증 검수','코드·AI 판독·계정 일치 여부를 한곳에서 확인하세요. · 예시','<div class="filter-buttons">'+['전체','검수 대기','AI 확인 필요','승인','반려'].map(s=>'<button class="'+((filter||'전체')===s?'active':'')+'" data-filter="'+(s==='전체'?'':s)+'">'+s+'</button>').join('')+'</div>'+table(['인증 번호','회원','발급 코드','AI 판독','계정 일치','검수 상태',''],reviews.filter(r=>!filter||r.status===filter).map(r=>['#'+r.id,r.member,'<span class="mono">'+r.code+'</span>',r.confidence,badge(r.matched?'일치':'불일치'),badge(r.status),btn('검수 ↗','review',r.id,'text-link')])));}
+function content(){switch(section){case'overview':return dashboard();case'products':return productList();case'categories':return panel('카테고리 · 태그','학습지의 분류와 탐색 구조를 관리합니다. · 예시','<div class="category-grid">'+categories.map((c,i)=>'<div><span>⊞</span><strong>'+esc(c)+'</strong><small>ID '+(i+1)+'</small></div>').join('')+'</div>',btn('+ 카테고리 추가','category','','primary'));case'orders':return panel('주문 · 결제 목록','결제와 환불 상태를 확인합니다. · 예시','<div class="filter-buttons">'+[['','전체'],['paid','결제 완료'],['review','확인 필요'],['pending','결제 대기'],['refunded','환불 완료']].map(s=>'<button class="'+(filter===s[0]?'active':'')+'" data-filter="'+s[0]+'">'+s[1]+'</button>').join('')+'</div>'+orderTable());case'refunds':return panel('환불 요청 검토','환불 고지 동의와 다운로드 이력을 함께 확인하세요. · 예시',table(['요청 / 주문','회원','환불 금액','사유','상태',''],[['#17 / #1031','샘플 회원 A','2,600원','아이가 다른 활동을 원해요',badge('requested'),btn('검토 ↗','refund','17','text-link')],['#16 / #1029','샘플 회원 C','990원','중복 구매했어요',badge('requested'),btn('검토 ↗','refund','16','text-link')]]));case'downloads':return panel('다운로드 · 발급 코드','발급한 PDF의 소유자와 사용 상태를 추적합니다. · 예시','<form id="code-search" class="search-form"><input name="code" placeholder="발급 코드 또는 해시 검색"><button class="primary">코드 검색</button></form>'+table(['발급 코드','소유 회원','학습지','다운로드','발급 시각','상태'],[['<span class="mono">CS05-9K4M-7P2X</span>','샘플 회원 A','실선이랑 점선이랑','2회','2026. 11. 25. 09:34',badge('ISSUED')],['<span class="mono">PZ03-2H7F-8A1Q</span>','샘플 회원 B','나만의 퍼즐 만들기','1회','2026. 11. 24. 16:15',badge('APPROVED')]]));case'challenges':return challengeList();case'members':return panel('회원 관리','회원 정보와 활동 이력을 확인합니다. · 예시','<form id="member-search" class="search-form"><input name="email" placeholder="회원 이름 또는 이메일 검색"><button class="primary">회원 검색</button></form>'+table(['회원','이메일','등록한 아이','가입일','상태',''],[['샘플 회원 A','sample-a@example.com','2명','2026. 11. 20.',badge('이용 중'),btn('상세 ↗','member','A','text-link')],['샘플 회원 B','sample-b@example.com','1명','2026. 11. 21.',badge('이용 중'),btn('상세 ↗','member','B','text-link')]]));case'support':return panel('문의 · 프로모션','문의와 공지, 이벤트를 관리합니다. · 예시','<div class="module-tabs"><span class="selected">1:1 문의</span><span>리뷰</span><span>공지사항</span><span>쿠폰 · 포인트</span></div>'+table(['유형','제목','회원','접수일','상태',''],[['다운로드','PDF를 다시 받을 수 있나요?','샘플 회원 A','2026. 11. 25.',badge('답변 대기'),btn('답변 ↗','support','','text-link')],['활동 문의','가위 활동은 어떻게 도와주나요?','샘플 회원 B','2026. 11. 24.',badge('답변 완료'),btn('열기 ↗','support','','text-link')]]),btn('+ 공지 등록','notice','','primary'));case'settings':return panel('시스템 · 권한 설정','배포와 권한 구성을 보여주는 예시 화면입니다.','<div class="integration-list">'+[['관리자 권한','일반 관리자 · 검수 담당자 · 콘텐츠 담당자','설정 예시'],['접속 정책','별도 도메인 · 관리자 전용 로그인','설정 예시'],['관리자 활동 로그','수정 · 승인 · 반려 기록','설정 예시'],['프리뷰 연결','이 HTML은 서버로 요청하지 않습니다','연결 없음']].map(s=>'<div><div><strong>'+s[0]+'</strong><p>'+s[1]+'</p></div>'+badge(s[2])+'</div>').join('')+'</div>');}}
+function render(){if(!logged){login();return;}const current=menus.find(m=>m[0]===section);app.innerHTML='<div class="console"><aside class="sidebar">'+brand+'<div class="workspace"><span class="workspace-mark">Y</span><div><strong>YIPPEE CLUB</strong><small>관리자 UI 미리보기</small></div><span class="live-dot"></span></div><nav aria-label="관리자 메뉴">'+menus.map(m=>'<div>'+(m[3]?'<p class="nav-group">'+m[3]+'</p>':'')+'<button class="nav-item '+(section===m[0]?'active':'')+'" data-nav="'+m[0]+'" '+(section===m[0]?'aria-current="page"':'')+'><span>'+m[1]+'</span>'+m[2]+'</button></div>').join('')+'</nav><div class="sidebar-bottom"><span class="avatar">Y</span><div><strong>'+esc(name)+'</strong><small>UI PREVIEW · 예시 계정</small></div>'+btn('↪','logout','','icon-button')+'</div></aside><button class="sidebar-shade" data-action="menu-close" aria-label="메뉴 닫기"></button><div class="main-shell"><header class="topbar"><div>'+btn('☰','menu','','mobile-menu icon-button')+'<span class="breadcrumb">워크스페이스 <b>/</b>'+current[2]+'</span></div><div class="topbar-right"><span class="connection">UI 미리보기 · 서버 연결 없음</span></div></header><main class="content"><div class="page-heading"><div><span class="eyebrow">YIPPEE CLUB OPERATIONS</span><h1>'+current[2]+'<span class="heading-dot">.</span></h1><p>작은 놀이가 큰 성장이 되는 공간을 함께 만듭니다.</p></div>'+btn('↻ 새로고침','refresh')+'</div>'+content()+'<footer>YIPPEE CLUB · HTML UI PREVIEW<span>표시된 모든 정보는 예시입니다.</span></footer></main></div></div>';}
+function productEditor(id){const p=products.find(p=>String(p.id)===id);openModal(p?'학습지 수정':'새 학습지 등록','<form id="product-form" data-id="'+esc(id)+'"><label>학습지 제목<input name="title" required value="'+esc(p?.title||'')+'"></label><div class="form-grid"><label>소장 가격<input name="price" type="number" min="0" required value="'+(p?.price||1900)+'"></label><label>공개 상태<select name="status"><option>공개</option><option '+(p?.status==='비공개'?'selected':'')+'>비공개</option></select></label><label>권장 연령<input name="age" value="'+esc(p?.age||'36~47개월')+'"></label><label>학습지 코드<input placeholder="CS05 · 예시 입력"></label></div><label>설명<textarea rows="3">선과 모양을 관찰하며 즐겁게 놀이해요.</textarea></label><div class="form-grid"><label>마스터 PDF<input type="file" accept=".pdf"></label><label>표지 이미지<input type="file" accept="image/*"></label></div><details class="unsupported"><summary>스탬프 · 발급 설정</summary><div class="form-grid" style="margin-top:15px"><label>스탬프 위치<select><option>상단 우측 여백</option><option>하단 우측 여백</option></select></label><label>적용 페이지<select><option>첫 장</option><option>모든 페이지</option></select></label></div></details><div class="notice">선택한 파일은 업로드되지 않습니다. 변경 사항은 열린 미리보기에서만 유지됩니다.</div><div class="actions">'+btn('닫기','close')+'<button class="primary">미리보기 저장</button></div></form>');}
+function reviewDetail(id){const r=reviews.find(r=>String(r.id)===id);openModal('인증 #'+id+' 검수 · 예시','<div class="review-layout"><div class="photo-demo"><div class="sample-paper"><small>'+esc(r.code)+'</small><h3>실선이랑 점선이랑</h3><div class="paper-lines">〰 ✂<br>······<br>☆ ♡</div></div><small>실제 사진이 아닌 UI 배치 예시입니다.</small></div><div><span class="eyebrow">AI & DATABASE CHECK</span><h3 style="margin-top:12px">'+r.member+'님의 놀이 기록</h3><div class="result-grid"><div><small>인식 코드</small><strong>'+r.code+'</strong></div><div><small>인식 신뢰도</small><strong>'+r.confidence+'</strong></div><div><small>발급 계정 일치</small>'+badge(r.matched?'일치':'불일치')+'</div><div><small>학습지 채움 여부</small>'+badge(r.filled?'완료':'미완료')+'</div><div><small>중복 인증 여부</small>'+badge('중복 없음')+'</div><div><small>현재 검수 상태</small>'+badge(r.status)+'</div></div><label>반려 사유<select id="reject-reason"><option>코드 미인식 / 잘림</option><option>다른 계정의 발급 코드</option><option>중복 인증</option><option>학습지 미완료</option></select></label><div class="actions">'+btn('반려','review-reject',id)+btn('승인','review-approve',id,'primary')+'</div></div></div>');}
+function orderDetail(id){const o=orders.find(o=>String(o.id)===id);openModal('주문 #'+id+' · 예시','<div class="detail-summary">'+badge(o.status)+'<strong>'+won(o.amount)+'</strong></div><dl class="details"><dt>회원</dt><dd>'+o.user+'</dd><dt>학습지</dt><dd>'+o.title+'</dd><dt>결제 수단</dt><dd>토스페이먼츠 · 예시</dd><dt>주문 시각</dt><dd>'+o.time+'</dd><dt>환불 고지 동의</dt><dd>'+o.time+'</dd></dl>'+table(['다운로드','최초 이용','마지막 이용'],[['2회','2026. 11. 25. 09:35','2026. 11. 25. 09:42']])+'<div class="actions">'+btn('상태 재확인','simulated','')+btn('환불 요청','refund','17','danger')+'</div>');}
+document.addEventListener('click',e=>{const nav=e.target.closest('[data-nav]');if(nav){e.preventDefault();if(!logged)return;section=nav.dataset.nav;filter='';render();return;}const f=e.target.closest('[data-filter]');if(f){filter=f.dataset.filter;render();return;}const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='close'){modal.close();return;}if(a==='logout'){logged=false;login();return;}if(a==='menu'){document.querySelector('.sidebar').classList.add('is-open');document.querySelector('.sidebar-shade').style.display='block';return;}if(a==='menu-close'){document.querySelector('.sidebar').classList.remove('is-open');b.style.display='none';return;}if(a==='refresh'){render();toast('예시 화면을 새로고침했습니다.');return;}if(a==='product'){productEditor(id);return;}if(a==='review'){reviewDetail(id);return;}if(a==='order'){orderDetail(id);return;}if(a==='review-approve'||a==='review-reject'){const r=reviews.find(r=>String(r.id)===id);r.status=a==='review-approve'?'승인':'반려';modal.close();render();toast('미리보기에서만 '+r.status+' 처리했습니다.');return;}if(a==='category'){openModal('카테고리 추가','<form id="category-form"><label>카테고리 이름<input name="name" required></label><button class="primary">미리보기 추가</button></form>');return;}if(a==='refund'){openModal('환불 요청 #'+id+' · 예시','<p class="modal-description">샘플 회원의 환불 사유와 다운로드 이력을 검토합니다.</p><dl class="details"><dt>사유</dt><dd>아이가 다른 활동을 원해요</dd><dt>환불 고지 동의</dt><dd>2026. 11. 25. 09:32</dd><dt>다운로드</dt><dd>0회</dd></dl><label>관리자 메모<textarea rows="3" placeholder="반려 시 회원에게 전달할 사유"></textarea></label><div class="actions">'+btn('반려 예시','simulated')+btn('승인 예시','simulated','','primary')+'</div>');return;}if(a==='member'){openModal('샘플 회원 '+id,'<div class="member-card"><span class="avatar large">Y</span><div><h3>샘플 회원 '+id+'</h3><p>sample@example.com</p></div>'+badge('이용 중')+'</div><dl class="details"><dt>등록한 아이</dt><dd>샘플 아이 · 만 3세</dd><dt>구매한 학습지</dt><dd>3개 · 예시</dd><dt>달성한 도전과제</dt><dd>2개 · 예시</dd></dl><div class="actions">'+btn('계정 정지 예시','simulated','','danger')+'</div>');return;}if(a==='support'||a==='notice'){openModal(a==='notice'?'공지 등록 · 예시':'문의 답변 · 예시','<form id="note-form"><label>제목<input value="'+(a==='notice'?'새로운 놀이 소식':'PDF를 다시 받을 수 있나요?')+'"></label><label>내용<textarea rows="6" placeholder="내용을 입력하세요"></textarea></label><button class="primary">미리보기 저장</button></form>');return;}if(a==='simulated'){modal.close();toast('UI 동작 예시입니다. 실제 처리는 발생하지 않았습니다.');}});
+document.addEventListener('submit',e=>{e.preventDefault();const form=e.target,fd=new FormData(form);if(form.id==='login'){name=String(fd.get('name')).trim()||'미리보기 관리자';logged=true;form.reset();render();return;}if(form.id==='product-search'){productQuery=String(fd.get('q')).trim();render();return;}if(form.id==='product-form'){const id=form.dataset.id;const p=products.find(p=>String(p.id)===id);const value={title:String(fd.get('title')),price:Number(fd.get('price')),age:String(fd.get('age')),status:String(fd.get('status'))};if(p)Object.assign(p,value);else products.unshift({...value,id:Math.max(...products.map(p=>p.id))+1,rental:null,icon:'✳'});modal.close();render();toast('예시 데이터에만 저장했습니다.');return;}if(form.id==='category-form'){categories.push(String(fd.get('name')).trim());modal.close();render();toast('미리보기 카테고리를 추가했습니다.');return;}if(form.id==='member-search'){toast('검색 동작 예시입니다. 표시된 회원은 샘플입니다.');return;}if(form.id==='code-search'){toast('코드 검색 동작 예시입니다. 실제 발급 이력은 조회하지 않습니다.');return;}modal.close();toast('미리보기에서만 저장했습니다.');});
+const decoratedDashboard = dashboard;
+dashboard = function() {
+  const html = decoratedDashboard();
+  return html;
+};
+const originalRender = render;
+render = function() {
+  originalRender();
+  if (!logged) return;
+  document.querySelector('.welcome-banner')?.remove();
+  const intro = document.querySelector('.page-heading p');
+  if (intro) intro.textContent = ({overview:'확인이 필요한 항목과 최근 주문입니다.',products:'학습지 파일과 판매 정보를 관리합니다.',categories:'학습지 분류를 관리합니다.',downloads:'발급 코드와 다운로드 기록을 확인합니다.',challenges:'사진과 판독 결과를 확인하고 승인 또는 반려합니다.',orders:'주문과 결제 상태를 확인합니다.',refunds:'환불 사유와 이용 기록을 확인합니다.',members:'회원 정보와 이용 상태를 관리합니다.',support:'문의와 공지사항을 관리합니다.',settings:'운영 설정을 확인합니다.'})[section];
+  document.querySelectorAll('.eyebrow,.heading-dot,.subtle-pill,.stat-card i,.todo-icon').forEach(el=>el.remove());
+  document.querySelectorAll('.brand').forEach(el=>el.innerHTML='YIPPEE CLUB<small>관리자</small>');
+  document.querySelectorAll('.nav-group').forEach(el=>{ if(el.textContent==='OVERVIEW') el.textContent='관리'; });
+  document.querySelectorAll('.stat-card p').forEach(el=>el.remove());
+  const footer=document.querySelector('footer'); if(footer) footer.innerHTML='관리자 화면 미리보기';
+};
+login = function() {
+  app.innerHTML='<main class="plain-login"><div class="plain-login-card"><div class="plain-wordmark">YIPPEE CLUB</div><h1>관리자 로그인</h1><p>화면 확인용입니다. 아무 값이나 입력하세요.</p><form id="login"><label>아이디<input name="name" autocomplete="off" required></label><label>비밀번호<input name="password" type="password" autocomplete="off" required></label><button class="primary full">로그인</button></form></div></main>';
+};
+login();
+</script></body></html>

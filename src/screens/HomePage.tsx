@@ -1,16 +1,16 @@
-import { useEffect, useId, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { OneClickOverlay } from './ReferenceScreens';
-import type { Activity } from '../types';
-import { trendingKeywords } from '../data/activities';
-import { demoActivities } from '../data/demo-activities';
-import { HorizontalRail } from '../components/HorizontalRail';
-import { ActivityCard } from '../components/ActivityCard';
-import { Icon } from '../components/Icon';
-import { GuideViewer } from '../components/GuideViewer';
-import { PlayCategoryIcon } from '../components/PlayCategoryIcon';
-import { useAuth } from '../context/AuthContext';
-import { useChildren } from '../context/ChildrenContext';
+import { useEffect, useId, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { OneClickOverlay } from "./ReferenceScreens";
+import type { Activity } from "../types";
+import { trendingKeywords } from "../data/activities";
+
+import { HorizontalRail } from "../components/HorizontalRail";
+import { ActivityCard } from "../components/ActivityCard";
+import { Icon } from "../components/Icon";
+import { GuideViewer } from "../components/GuideViewer";
+import { PlayCategoryIcon } from "../components/PlayCategoryIcon";
+import { useAuth } from "../context/AuthContext";
+import { useChildren } from "../context/ChildrenContext";
 
 export interface CatalogProps {
   activities: Activity[];
@@ -31,7 +31,7 @@ export function TrendingKeywords({
   const listId = useId();
 
   return (
-    <section className={`section ${compact ? 'section--compact' : ''}`}>
+    <section className={`section ${compact ? "section--compact" : ""}`}>
       <h2>실시간 인기 검색어</h2>
       <div className="trending-box">
         <div className="section-heading">
@@ -43,7 +43,7 @@ export function TrendingKeywords({
               aria-controls={listId}
               onClick={() => setExpanded(!expanded)}
             >
-              {expanded ? '접기' : '펼치기'}
+              {expanded ? "접기" : "펼치기"}
             </button>
           )}
         </div>
@@ -81,11 +81,11 @@ export function HomePage({ activities, savedIds, onToggle }: CatalogProps) {
   const { user, ready, requestLogin } = useAuth();
   const { activeChild: child, children, select } = useChildren();
   const [selecting, setSelecting] = useState(false);
-  const [selectionError, setSelectionError] = useState('');
-  const popularActivities = demoActivities;
+  const [selectionError, setSelectionError] = useState("");
+  const popularActivities = activities;
   async function chooseChild(id: number) {
     setSelecting(true);
-    setSelectionError('');
+    setSelectionError("");
     try {
       await select(id);
     } catch (cause) {
@@ -98,14 +98,14 @@ export function HomePage({ activities, savedIds, onToggle }: CatalogProps) {
     if (
       ready &&
       !user &&
-      sessionStorage.getItem('yippee.guest.browsing') !== 'true'
+      sessionStorage.getItem("yippee.guest.browsing") !== "true"
     )
       requestLogin();
   }, [ready, user]);
   return (
     <div
       className="home-page"
-      data-figma-node={user ? (child ? '122:1781' : '122:1891') : '168:4872'}
+      data-figma-node={user ? (child ? "122:1781" : "122:1891") : "168:4872"}
     >
       <header className="home-header">
         <Link
@@ -144,7 +144,7 @@ export function HomePage({ activities, savedIds, onToggle }: CatalogProps) {
               </>
             ) : (
               <>
-                {children.length ? '아이를 선택하면' : '아이를 등록하면'}
+                {children.length ? "아이를 선택하면" : "아이를 등록하면"}
                 <br />
                 맞춤 놀이를 찾아드려요
               </>
@@ -162,8 +162,8 @@ export function HomePage({ activities, savedIds, onToggle }: CatalogProps) {
             <section className="info-panel home-child-invite">
               <strong>
                 {children.length
-                  ? '놀이할 아이를 선택해 주세요.'
-                  : '우리 아이 정보를 저장해주세요.'}
+                  ? "놀이할 아이를 선택해 주세요."
+                  : "우리 아이 정보를 저장해주세요."}
               </strong>
               {children.length ? (
                 <label className="wire-field">
@@ -205,7 +205,7 @@ export function HomePage({ activities, savedIds, onToggle }: CatalogProps) {
                 to="/how-to"
                 onClick={(event) => {
                   event.preventDefault();
-                  setParams({ guide: 'how-to' });
+                  setParams({ guide: "how-to" });
                 }}
               >
                 <small>이용방법</small>
@@ -225,7 +225,7 @@ export function HomePage({ activities, savedIds, onToggle }: CatalogProps) {
                 to="/how-to/badges"
                 onClick={(event) => {
                   event.preventDefault();
-                  setParams({ guide: 'badges' });
+                  setParams({ guide: "badges" });
                 }}
               >
                 <small>이용방법</small>
@@ -253,14 +253,14 @@ export function HomePage({ activities, savedIds, onToggle }: CatalogProps) {
         <section className="home-category-panel" aria-label="놀이 유형">
           <div className="home-category-grid">
             {[
-              '그림/색칠',
-              '만들기',
-              '한글',
-              '숫자',
-              '역할',
-              '영어',
-              '음악',
-              '체육',
+              "그림/색칠",
+              "만들기",
+              "한글",
+              "숫자",
+              "역할",
+              "영어",
+              "음악",
+              "체육",
             ].map((category) => (
               <Link
                 key={category}
@@ -306,7 +306,7 @@ export function HomePage({ activities, savedIds, onToggle }: CatalogProps) {
                 onToggle={onToggle}
                 preview={!user}
                 onPreview={requestLogin}
-                detailTo={`/activities/examples/${activity.slug}`}
+                detailTo={`/activities/${activity.id}`}
                 showPreviewMeta
                 showSave={!user}
               />
@@ -325,7 +325,7 @@ export function HomePage({ activities, savedIds, onToggle }: CatalogProps) {
             label="엄마아빠 가이드북"
             className="home-guide-track"
           >
-            {['낯가리는 아이', '약속하기 연습'].map((title, index) => (
+            {["낯가리는 아이", "약속하기 연습"].map((title, index) => (
               <Link
                 className="guide-row"
                 to={`/guides/${index + 1}`}
@@ -339,20 +339,20 @@ export function HomePage({ activities, savedIds, onToggle }: CatalogProps) {
           </HorizontalRail>
         </section>
       </div>
-      {['how-to', 'badges'].includes(params.get('guide') || '') && (
+      {["how-to", "badges"].includes(params.get("guide") || "") && (
         <GuideViewer
-          kind={params.get('guide') === 'badges' ? 'badges' : 'how-to'}
+          kind={params.get("guide") === "badges" ? "badges" : "how-to"}
           onClose={() => setParams({}, { replace: true })}
         />
       )}
-      {params.get('finder') === '1' && (
+      {params.get("finder") === "1" && (
         <OneClickOverlay
           activities={activities}
           onClose={() => setParams({}, { replace: true })}
           onFind={(playFilters) => {
             if (!user) requestLogin();
             else
-              navigate('/recommendations', {
+              navigate("/recommendations", {
                 replace: true,
                 state: { playFilters },
               });

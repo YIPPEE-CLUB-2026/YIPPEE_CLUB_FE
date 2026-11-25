@@ -6,7 +6,12 @@
     "dev": "next dev --hostname 127.0.0.1",
     "build": "next build",
     "start": "next start --hostname 127.0.0.1",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.cjs",
+    "admin:dev": "npm --prefix apps/admin run dev",
+    "admin:build": "npm --prefix apps/admin run build",
+    "admin:typecheck": "npm --prefix apps/admin run typecheck",
+    "build:pages": "node scripts/build-pages.cjs"
   },
   "dependencies": {
     "next": "16.4.6",

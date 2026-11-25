@@ -14,7 +14,7 @@ export function NavigationHistory() {
     if (Number.isInteger(index))
       recordNavigation(
         index,
-        { key: location.key, path: location.pathname + location.search },
+        { key: location.key, path: location.pathname.startsWith("/auth/callback/") ? location.pathname : location.pathname + location.search },
         action,
       );
   }, [location.key, location.pathname, location.search, action]);

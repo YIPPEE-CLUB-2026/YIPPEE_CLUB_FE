@@ -1,11 +1,11 @@
-import { apiRequest } from '../lib/api';
+import { apiRequest } from "../lib/api";
 
 export interface Profile {
   id: number;
   email: string;
-  name: string;
-  phone: string;
-  nickname: string;
+  name: string | null;
+  phone: string | null;
+  nickname: string | null;
 }
 
 export interface ProfileRead extends Profile {
@@ -21,12 +21,12 @@ export function mergeProfileUpdate(
 }
 
 export function getProfile() {
-  return apiRequest<ProfileRead>('/users/me');
+  return apiRequest<ProfileRead>("/users/me");
 }
 
 export function updateProfile(name: string, nickname?: string) {
-  return apiRequest<Profile>('/users/me', {
-    method: 'PATCH',
+  return apiRequest<Profile>("/users/me", {
+    method: "PATCH",
     body: JSON.stringify({
       name: name.trim(),
       ...(nickname === undefined ? {} : { nickname }),
@@ -35,14 +35,17 @@ export function updateProfile(name: string, nickname?: string) {
 }
 
 export function passwordError(password: string, confirmation: string): string {
-  if (!/^(?=.*[A-Za-z])(?=.*\d).{8,128}$/.test(password))
-    return '영문·숫자를 포함해 8자 이상 128자 이하로 입력해 주세요.';
-  return password !== confirmation ? '새 비밀번호가 일치하지 않아요.' : '';
+  if (
+    !/^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(password) ||
+    new TextEncoder().encode(password).length > 72
+  )
+    return "영문·숫자를 포함해 8자 이상, 72바이트 이하로 입력해 주세요.";
+  return password !== confirmation ? "새 비밀번호가 일치하지 않아요." : "";
 }
 
 export function changePassword(currentPassword: string, newPassword: string) {
-  return apiRequest<{ message: string }>('/users/me/password', {
-    method: 'PATCH',
+  return apiRequest<{ message: string }>("/users/me/password", {
+    method: "PATCH",
     body: JSON.stringify({
       current_password: currentPassword,
       new_password: newPassword,

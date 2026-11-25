@@ -94,7 +94,7 @@
   font-size: 14px;
   font-weight: 400;
 }
-.club-auth--terms input[type='checkbox'] {
+.club-auth--terms input[type="checkbox"] {
   appearance: none;
   width: 24px;
   height: 24px;
@@ -105,12 +105,12 @@
   display: grid;
   place-items: center;
 }
-.club-auth--terms input[type='checkbox']:checked {
+.club-auth--terms input[type="checkbox"]:checked {
   background: var(--yippee-yellow);
   border-color: #c79f3a;
 }
-.club-auth--terms input[type='checkbox']:checked::after {
-  content: '';
+.club-auth--terms input[type="checkbox"]:checked::after {
+  content: "";
   background: none;
   filter: none;
   width: 10px;
@@ -218,7 +218,7 @@
 .identity-page .identity-birth input:first-child {
   flex: 0 1 186px;
 }
-.identity-page .identity-birth input[type='password'] {
+.identity-page .identity-birth input[type="password"] {
   width: 60px;
   padding: 0 8px;
   text-align: center;
@@ -318,3 +318,47 @@
     flex: 1;
   }
 }
+
+.social-button--google {
+  background: #fff;
+  border: 1px solid #dedbd4;
+  color: #4d443c;
+}
+.social-button--google .social-provider-mark b {
+  font:
+    700 23px/1 Arial,
+    sans-serif;
+  color: #4285f4;
+}
+.social-consents {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 22px 0;
+  font-size: 13px;
+}
+.social-consents a {
+  margin-left: auto;
+  text-decoration: underline;
+}
+
+/* 소셜 동의 팝업은 화면 양옆 여백을 확보하고 긴 약관 제목도 행 안에서 줄바꿈합니다. */
+.wire-dialog.wire-popup.social-consent-dialog {
+  width: min(354px, calc(100vw - 40px));
+  max-width: calc(100vw - 40px);
+  max-height: calc(100dvh - 48px);
+  padding: 24px;
+  border-radius: 24px;
+  box-sizing: border-box;
+}
+.social-consent-heading { display: flex; align-items: center; gap: 12px; }
+.social-consent-heading h2 { flex: 1; margin: 0; font-size: 20px; line-height: 1.4; }
+.social-consent-close { flex: 0 0 32px; width: 32px; height: 32px; padding: 0; display: grid; place-items: center; border: 0; background: transparent; color: inherit; font-size: 26px; }
+.social-consent-dialog > p { margin: 12px 0 0; font-size: 14px; line-height: 1.6; word-break: keep-all; }
+.social-consent-dialog .social-consents { margin: 24px 0; gap: 18px; }
+.social-consent-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: start; }
+.social-consent-row .checkbox-label { display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: start; gap: 9px; min-width: 0; font-size: 13px; line-height: 1.6; }
+.social-consent-row .checkbox-label input { width: 20px; height: 20px; margin: 1px 0 0; }
+.social-consent-row .checkbox-label span { min-width: 0; word-break: keep-all; overflow-wrap: anywhere; }
+.social-consent-row > a { margin: 0; font-size: 12px; line-height: 1.8; white-space: nowrap; }
+.social-consent-dialog > .button { width: 100%; min-width: 0; min-height: 48px; margin: 0; border-radius: 14px; }

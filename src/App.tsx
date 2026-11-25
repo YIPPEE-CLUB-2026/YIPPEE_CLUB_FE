@@ -1,58 +1,63 @@
-import { useEffect, useState } from 'react';
-import { showToast } from './components/Toast';
-import { CardsPage } from './screens/CardsPage';
-import { CheckoutPage, PaymentResultPage } from './screens/CheckoutPage';
-import { ChildRegistrationPage } from './screens/ChildRegistrationPage';
-import { ReviewsPage } from './screens/ReviewsPage';
-import { PhoneChangePage } from './screens/PhoneChangePage';
-import { NotificationsPage } from './screens/NotificationsPage';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { Layout } from './components/Layout';
-import { HomePage } from './screens/HomePage';
-import { ActivitiesPage } from './screens/ActivitiesPage';
-import { OrdersPage } from './screens/OrdersPage';
+import { SocialCallbackPage } from "./screens/SocialCallbackPage";
+import { useEffect, useState } from "react";
+import { showToast } from "./components/Toast";
+import { CardsPage } from "./screens/CardsPage";
+import {
+  CheckoutPage,
+  PaymentResultPage,
+  PaymentCallbackPage,
+} from "./screens/CheckoutPage";
+import { ChildRegistrationPage } from "./screens/ChildRegistrationPage";
+import { ReviewsPage } from "./screens/ReviewsPage";
+import { PhoneChangePage } from "./screens/PhoneChangePage";
+import { NotificationsPage } from "./screens/NotificationsPage";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Layout } from "./components/Layout";
+import { HomePage } from "./screens/HomePage";
+import { ActivitiesPage } from "./screens/ActivitiesPage";
+import { OrdersPage } from "./screens/OrdersPage";
 import {
   OrderDetailPage,
   OrderCancelPage,
   ReceiptPage,
-} from './screens/OrderDetails';
-import { ViewerPage } from './screens/ViewerPage';
-import { LoadingState } from './components/LoadingState';
-import { SystemFeedback } from './components/SystemFeedback';
-import { GrowthReportPage } from './screens/GrowthReportPage';
-import { InquiryDetailPage } from './screens/InquiryDetailPage';
+} from "./screens/OrderDetails";
+import { ViewerPage } from "./screens/ViewerPage";
+import { LoadingState } from "./components/LoadingState";
+import { SystemFeedback } from "./components/SystemFeedback";
+import { GrowthReportPage } from "./screens/GrowthReportPage";
+import { InquiryDetailPage } from "./screens/InquiryDetailPage";
 import {
   WalletPage,
   CouponsPage,
   CouponDetailPage,
   CashChargePage,
-} from './screens/WalletPages';
-import { PopularPage } from './screens/PopularPage';
-import { BadgeGuidePage } from './screens/BadgeGuidePage';
-import { IdentityPage } from './screens/IdentityPage';
-import { ActivityWritePage } from './screens/ActivityWritePage';
+} from "./screens/WalletPages";
+import { PopularPage } from "./screens/PopularPage";
+import { BadgeGuidePage } from "./screens/BadgeGuidePage";
+import { IdentityPage } from "./screens/IdentityPage";
+import { ActivityWritePage } from "./screens/ActivityWritePage";
 import {
   ReferenceRecommendationsPage as RecommendationsPage,
   ReferenceAccountInfoPage,
-} from './screens/ReferenceScreens';
+} from "./screens/ReferenceScreens";
 import {
   BadgesPage,
   ProfilePage,
   ProfileEditPage,
   SavedPage,
-} from './screens/AccountPages';
-import { listActivities } from './services/activities';
-import type { Activity } from './types';
-import { useAuth } from './context/AuthContext';
-import { apiRequest, readTokens } from './lib/api';
-import type { Paginated } from './types';
+} from "./screens/AccountPages";
+import { listActivities } from "./services/activities";
+import type { Activity } from "./types";
+import { useAuth } from "./context/AuthContext";
+import { apiRequest, readTokens } from "./lib/api";
+import type { Paginated } from "./types";
 import {
   PasswordChangePage,
   PasswordChangedPage,
-} from './screens/PasswordChangePage';
-import { PasswordResetPage } from './screens/PasswordResetPage';
-import { AuthPage } from './screens/AuthPage';
-import { SearchPage } from './screens/SearchPage';
+} from "./screens/PasswordChangePage";
+import { PasswordResetPage } from "./screens/PasswordResetPage";
+import { AuthPage } from "./screens/AuthPage";
+import { SearchPage } from "./screens/SearchPage";
 import {
   FAQPage,
   InquiryPage,
@@ -60,17 +65,17 @@ import {
   NoticesPage,
   TextDocumentPage,
   AccountFormPage,
-} from './screens/SupportSubPages';
+} from "./screens/SupportSubPages";
 import {
   OnboardingPage,
   VersionPage,
   LicensesPage,
   WithdrawPage,
-} from './screens/MoreScreens';
-import { CartPage, ActivityDetailPage } from './screens/ConnectedPages';
-import { DemoActivityDetailPage } from './screens/DemoActivityDetailPage';
-import { DemoActivityViewerPage } from './screens/DemoActivityViewerPage';
-import { ChildrenPage, ChildFormPage } from './screens/ChildrenPages';
+} from "./screens/MoreScreens";
+import { CartPage, ActivityDetailPage } from "./screens/ConnectedPages";
+import { DemoActivityDetailPage } from "./screens/DemoActivityDetailPage";
+import { DemoActivityViewerPage } from "./screens/DemoActivityViewerPage";
+import { ChildrenPage, ChildFormPage } from "./screens/ChildrenPages";
 import {
   GuidesPage,
   GuideDetailPage,
@@ -80,14 +85,14 @@ import {
   SettingsPage,
   NotificationSettingsPage,
   SupportPage,
-} from './screens/AdditionalPages';
+} from "./screens/AdditionalPages";
 
 export function App() {
   const { user, ready, requestLogin, isPreview, sessionError, reload } =
     useAuth();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
   // 로그인한 사용자의 찜은 서버에 저장하며 사용자 변경 시 다시 조회합니다.
   const [savedIds, setSavedIds] = useState<number[]>([]);
@@ -97,7 +102,7 @@ export function App() {
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
-    setError('');
+    setError("");
 
     listActivities(controller.signal)
       .then((items) => {
@@ -108,7 +113,7 @@ export function App() {
           setError(
             cause instanceof Error
               ? cause.message
-              : '활동지를 불러오지 못했어요.',
+              : "활동지를 불러오지 못했어요.",
           );
       })
       .finally(() => {
@@ -123,7 +128,7 @@ export function App() {
     const controller = new AbortController();
     setSavedIds([]);
     if (user)
-      apiRequest<Paginated<Activity>>('/favorites?page_size=100', {
+      apiRequest<Paginated<Activity>>("/favorites?page_size=100", {
         signal: controller.signal,
       })
         .then((page) => {
@@ -145,16 +150,16 @@ export function App() {
     setSaving(true);
     try {
       const saved = savedIds.includes(id);
-      await apiRequest(saved ? `/favorites/${id}` : '/favorites', {
-        method: saved ? 'DELETE' : 'POST',
+      await apiRequest(saved ? `/favorites/${id}` : "/favorites", {
+        method: saved ? "DELETE" : "POST",
         ...(saved ? {} : { body: JSON.stringify({ activity_id: id }) }),
       });
       setSavedIds((previous) =>
         saved ? previous.filter((item) => item !== id) : [...previous, id],
       );
       showToast(
-        saved ? '찜을 해제했어요' : '찜 했어요',
-        saved ? '123:2585' : '123:2540',
+        saved ? "찜을 해제했어요" : "찜 했어요",
+        saved ? "123:2585" : "123:2540",
       );
     } catch (cause) {
       setError((cause as Error).message);
@@ -165,15 +170,15 @@ export function App() {
 
   const catalogProps = { activities, savedIds, onToggle: toggleSaved };
   const needsCatalog =
-    pathname === '/' ||
-    pathname.startsWith('/activities') ||
-    pathname.startsWith('/search') ||
-    pathname === '/saved';
+    pathname === "/" ||
+    pathname.startsWith("/activities") ||
+    pathname.startsWith("/search") ||
+    pathname === "/saved";
 
   if (!ready) return <LoadingState />;
 
   const privatePath =
-    /^\/(?:children|signup\/child|saved|cart|checkout|profile\/edit|settings\/(?:password|withdraw)|activities\/[^/]+\/(?:record|reviews\/new))(?:\/|$)/.test(
+    /^\/(?:orders|viewer|children|signup\/child|saved|cart|checkout|profile\/edit|settings\/(?:password|withdraw)|activities\/[^/]+\/(?:record|reviews\/new))(?:\/|$)/.test(
       pathname,
     );
   if (!user && sessionError && readTokens() && privatePath)
@@ -215,7 +220,7 @@ export function App() {
           </button>
         </div>
       )}
-      {sessionError && !sessionError.includes('만료') && (
+      {sessionError && !sessionError.includes("만료") && (
         <div className="info-panel" role="alert">
           <p>{sessionError}</p>
           <button
@@ -252,11 +257,11 @@ export function App() {
           />
           <Route
             path="activities/examples/:exampleSlug"
-            element={<DemoActivityDetailPage />}
+            element={<Navigate to="/activities" replace />}
           />
           <Route
             path="viewer/examples/:exampleSlug"
-            element={<DemoActivityViewerPage />}
+            element={<Navigate to="/activities" replace />}
           />
           <Route
             path="activities/:activityId"
@@ -267,7 +272,7 @@ export function App() {
             path="search"
             element={
               <SearchPage
-                key={`input-${user?.id || 'guest'}`}
+                key={`input-${user?.id || "guest"}`}
                 {...catalogProps}
               />
             }
@@ -276,7 +281,7 @@ export function App() {
             path="search/results"
             element={
               <SearchPage
-                key={`results-${user?.id || 'guest'}`}
+                key={`results-${user?.id || "guest"}`}
                 {...catalogProps}
               />
             }
@@ -285,6 +290,10 @@ export function App() {
           <Route path="profile/edit" element={<ProfileEditPage />} />
           <Route path="badges" element={<BadgesPage />} />
           <Route path="login" element={<AuthPage />} />
+          <Route
+            path="auth/callback/:provider"
+            element={<SocialCallbackPage />}
+          />
           <Route path="onboarding" element={<OnboardingPage />} />
           <Route path="version" element={<VersionPage />} />
           <Route path="licenses" element={<LicensesPage />} />
@@ -305,6 +314,12 @@ export function App() {
             path="checkout"
             element={<CheckoutPage activities={activities} />}
           />
+          <Route
+            path="checkout/payment"
+            element={<Navigate to="/checkout" replace />}
+          />
+          <Route path="checkout/success" element={<PaymentCallbackPage />} />
+          <Route path="checkout/fail" element={<PaymentCallbackPage />} />
           <Route path="checkout/result" element={<PaymentResultPage />} />
           <Route
             path="recommendations"

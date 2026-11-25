@@ -86,7 +86,7 @@
   font-size: 14px;
   gap: 8px;
 }
-.checkout-agreement input[type='checkbox'] {
+.checkout-agreement input[type="checkbox"] {
   width: 24px;
   height: 24px;
   min-width: 24px;
@@ -417,7 +417,7 @@
   font-size: 14px;
   gap: 8px;
 }
-.account-form--card input[type='checkbox'] {
+.account-form--card input[type="checkbox"] {
   width: 24px;
   height: 24px;
   min-width: 24px;
@@ -479,6 +479,17 @@
   border-radius: 25px;
   gap: 16px;
 }
+/* 열린 안내창에서만 간격을 적용해 제목·설명·버튼이 붙지 않게 합니다. */
+.system-feedback.wire-popup[open] {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  height: fit-content;
+}
 .system-feedback h2 {
   font-size: 20px;
   font-weight: 600;
@@ -518,7 +529,7 @@
   color: var(--color-muted);
   font-size: 12px;
 }
-.wire-faq [data-figma-node='124:4716'] {
+.wire-faq [data-figma-node="124:4716"] {
   min-height: 0;
   padding-top: 140px;
   justify-content: flex-start;
@@ -592,7 +603,7 @@
   font-size: 14px;
   font-weight: 600;
 }
-.wire-coupon-form input[aria-invalid='true'] {
+.wire-coupon-form input[aria-invalid="true"] {
   border-color: #ff4545;
 }
 .wire-growth h2,
@@ -1171,7 +1182,7 @@
   line-height: 18px;
   background: var(--yippee-white, #fffdf7);
 }
-.wire-catalog .experience-categories button[aria-pressed='true'] {
+.wire-catalog .experience-categories button[aria-pressed="true"] {
   background: var(--yippee-yellow, #ffd96b);
   border-color: var(--yippee-yellow, #ffd96b);
 }
@@ -1438,4 +1449,22 @@
     width: 100px;
     height: 65px;
   }
+}
+
+.preview-payment {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.preview-payment__methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.preview-payment__methods .button {
+  flex: 1;
+}
+.preview-payment__methods .button[aria-pressed="true"] {
+  background: var(--yippee-yellow);
+  border-color: var(--yippee-brown);
 }

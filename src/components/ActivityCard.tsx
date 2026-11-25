@@ -1,9 +1,8 @@
-import { demoActivities } from '../data/demo-activities';
-import { Link } from 'react-router-dom';
-import type { ReactNode } from 'react';
-import type { Activity } from '../types';
-import { Icon } from './Icon';
-import { ActivityThumbnail } from './ActivityThumbnail';
+import { Link } from "react-router-dom";
+import type { ReactNode } from "react";
+import type { Activity } from "../types";
+import { Icon } from "./Icon";
+import { ActivityThumbnail } from "./ActivityThumbnail";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -32,8 +31,7 @@ export function ActivityCard({
   showPreviewMeta = preview,
   saveIcon,
 }: ActivityCardProps) {
-  const demo = demoActivities.find((item) => item.id === activity.id);
-  const activityPath = detailTo || (demo ? `/activities/examples/${demo.slug}` : `/activities/${activity.id}`);
+  const activityPath = detailTo || `/activities/${activity.id}`;
   const previewClick = preview
     ? (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
@@ -42,11 +40,11 @@ export function ActivityCard({
     : undefined;
   return (
     <article
-      className={`activity-card ${activity.location ? 'activity-card--experience' : ''}`}
+      className={`activity-card ${activity.location ? "activity-card--experience" : ""}`}
     >
       <Link
         className="activity-card__thumbnail"
-        to={preview ? '/login' : activityPath}
+        to={preview ? "/login" : activityPath}
         onClick={previewClick}
         aria-label={`${activity.title} 상세 보기`}
       >
@@ -67,17 +65,17 @@ export function ActivityCard({
         <button
           className="activity-card__save"
           type="button"
-          aria-label={`${activity.title} ${saved ? '저장 해제' : '저장'}`}
+          aria-label={`${activity.title} ${saved ? "저장 해제" : "저장"}`}
           aria-pressed={saved}
           onClick={() => (preview ? onPreview?.() : onToggle(activity.id))}
         >
-          {saveIcon || <Icon name={saved ? 'heartFilled' : 'heart'} />}
+          {saveIcon || <Icon name={saved ? "heartFilled" : "heart"} />}
         </button>
       )}
       {showPreviewMeta ? (
         <div className="guest-activity-meta">
           <span
-            className={`tag ${activity.subtitle === '신체&인지' ? 'tag--cognitive' : ''}`}
+            className={`tag ${activity.subtitle === "신체&인지" ? "tag--cognitive" : ""}`}
           >
             {activity.subtitle}
           </span>
@@ -88,7 +86,7 @@ export function ActivityCard({
           </span>
         </div>
       ) : (
-        <span className={`tag ${activity.location ? 'tag--location' : ''}`}>
+        <span className={`tag ${activity.location ? "tag--location" : ""}`}>
           {activity.location ||
             (activity.duration
               ? activity.durationMin !== undefined
@@ -96,12 +94,12 @@ export function ActivityCard({
                   ? `${activity.duration}분`
                   : `${activity.durationMin}–${activity.durationMax}분`
                 : `${activity.duration}분`
-              : '시간 미정')}
+              : "시간 미정")}
         </span>
       )}
       <Link
         className="activity-card__title"
-        to={preview ? '/login' : activityPath}
+        to={preview ? "/login" : activityPath}
         onClick={previewClick}
       >
         {!showPreviewMeta && <span>[{activity.subtitle}]</span>}
@@ -109,10 +107,10 @@ export function ActivityCard({
       </Link>
       <Link
         className="activity-card__price"
-        to={preview ? '/login' : activityPath}
+        to={preview ? "/login" : activityPath}
         onClick={previewClick}
       >
-        <strong>{activity.price.toLocaleString('ko-KR')}원</strong>
+        <strong>{activity.price.toLocaleString("ko-KR")}원</strong>
       </Link>
     </article>
   );

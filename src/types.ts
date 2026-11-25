@@ -5,8 +5,13 @@ export interface Activity {
   subtitle: string;
   category: string;
   price: number;
+  rentalPrice?: number | null;
+  rentalDays?: number;
+  plan?: "permanent" | "rental";
+  expiresAt?: string | null;
+  expired?: boolean;
   duration: number;
-  difficulty: 'easy' | 'normal' | 'hard';
+  difficulty: "easy" | "normal" | "hard";
   categoryIds?: number[];
   categoryNames?: string[];
   description?: string;

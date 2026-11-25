@@ -5,25 +5,25 @@ import {
   useState,
   useRef,
   type ReactNode,
-} from 'react';
+} from "react";
 import {
   ApiError,
   apiRequest,
   readTokens,
   saveTokens,
   type Tokens,
-} from '../lib/api';
+} from "../lib/api";
 import {
   getProfile,
   updateProfile,
   mergeProfileUpdate,
   type ProfileRead,
-} from '../services/profile';
+} from "../services/profile";
 import {
   readPreviewSession,
   createPreviewSession,
   clearPreviewSession,
-} from '../lib/preview-session';
+} from "../lib/preview-session";
 
 export type User = ProfileRead;
 interface AuthState {
@@ -36,7 +36,7 @@ interface AuthState {
   saveProfile: (name: string, nickname?: string) => Promise<void>;
   clearSession: () => void;
   setActiveChild: (id: number | null, replacing?: number) => void;
-  previewLogin: (email: string) => void;
+
   isPreview: boolean;
   loginNotice: boolean;
   loginPromptOpen: boolean;
@@ -48,15 +48,15 @@ const AuthContext = createContext<AuthState | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
-  const [sessionError, setSessionError] = useState('');
+  const [sessionError, setSessionError] = useState("");
   const generation = useRef(0);
   const profileRevision = useRef(0);
-  const [isPreview, setIsPreview] = useState(false);
+  const isPreview = false;
   const [loginNotice, setLoginNotice] = useState(false);
   const [loginPromptOpen, setLoginPromptOpen] = useState(false);
   const requestLogin = () => setLoginPromptOpen(true);
   function dismissLogin() {
-    sessionStorage.setItem('yippee.guest.browsing', 'true');
+    sessionStorage.setItem("yippee.guest.browsing", "true");
     setLoginPromptOpen(false);
   }
   useEffect(() => {
@@ -64,17 +64,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const timer = setTimeout(() => setLoginNotice(false), 2000);
     return () => clearTimeout(timer);
   }, [loginNotice]);
-  function previewLogin(email: string) {
-    generation.current++;
-    setSessionError('');
-    const previewUser = createPreviewSession(email);
-    saveTokens(null);
-    setUser(previewUser);
-    setIsPreview(true);
-    setReady(true);
-    setLoginPromptOpen(false);
-    setLoginNotice(true);
-  }
   async function reload() {
     const version = generation.current;
     const revision = profileRevision.current;
@@ -87,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         readTokens()?.refresh_token === session
       ) {
         setUser(profile);
-        setSessionError('');
+        setSessionError("");
       }
     } catch (cause) {
       if (generation.current !== version) return;
@@ -96,21 +85,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
         throw cause;
       }
-      setSessionError('로그인 정보를 불러오지 못했어요. 다시 시도해 주세요.');
+      setSessionError("로그인 정보를 불러오지 못했어요. 다시 시도해 주세요.");
+      throw cause;
     }
   }
   async function saveProfile(name: string, nickname?: string) {
     const version = generation.current;
     const profile = await updateProfile(name, nickname);
     if (version !== generation.current)
-      throw new Error('로그인 상태가 변경됐어요. 다시 로그인해 주세요.');
+      throw new Error("로그인 상태가 변경됐어요. 다시 로그인해 주세요.");
     profileRevision.current++;
     setUser((current) =>
       current && current.id === profile.id
         ? mergeProfileUpdate(current, profile)
         : current,
     );
-    setSessionError('');
+    setSessionError("");
   }
   function setActiveChild(id: number | null, replacing?: number) {
     profileRevision.current++;
@@ -123,20 +113,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
   function clearSession() {
     generation.current++;
-    clearPreviewSession();
+
     saveTokens(null);
     setUser(null);
-    setIsPreview(false);
-    setSessionError('');
+
+    setSessionError("");
     setLoginNotice(false);
     setLoginPromptOpen(false);
   }
   async function establish(tokens: Tokens) {
     generation.current++;
-    clearPreviewSession();
-    setIsPreview(false);
+
     setUser(null);
-    setSessionError('');
+    setSessionError("");
     saveTokens(tokens);
     await reload();
     setLoginPromptOpen(false);
@@ -145,16 +134,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function logout() {
     generation.current++;
     const tokens = readTokens();
-    const preview = readPreviewSession();
-    clearPreviewSession();
+
     saveTokens(null);
     setUser(null);
-    setIsPreview(false);
-    setSessionError('');
+
+    setSessionError("");
     setLoginNotice(false);
-    if (!preview && tokens) {
-      await apiRequest('/auth/logout', {
-        method: 'POST',
+    if (tokens) {
+      await apiRequest("/auth/logout", {
+        method: "POST",
         body: JSON.stringify({ refresh_token: tokens.refresh_token }),
       });
     }
@@ -164,15 +152,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const expired = () => {
       generation.current++;
       setUser(null);
-      setSessionError('로그인이 만료됐어요. 다시 로그인해 주세요.');
+      setSessionError("로그인이 만료됐어요. 다시 로그인해 주세요.");
     };
-    window.addEventListener('yippee:session-expired', expired);
-    const preview = readPreviewSession();
-    if (preview) {
-      setUser(preview.user);
-      setIsPreview(true);
-      setReady(true);
-    } else if (readTokens()) {
+    window.addEventListener("yippee:session-expired", expired);
+
+    if (readTokens()) {
       void reload()
         .catch(() => {})
         .finally(() => {
@@ -182,7 +166,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       mounted = false;
       generation.current++;
-      window.removeEventListener('yippee:session-expired', expired);
+      window.removeEventListener("yippee:session-expired", expired);
     };
   }, []);
   return (
@@ -197,7 +181,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         saveProfile,
         clearSession,
         setActiveChild,
-        previewLogin,
+
         isPreview,
         loginNotice,
         loginPromptOpen,
@@ -211,6 +195,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 }
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('AuthProvider가 필요합니다.');
+  if (!context) throw new Error("AuthProvider가 필요합니다.");
   return context;
 }

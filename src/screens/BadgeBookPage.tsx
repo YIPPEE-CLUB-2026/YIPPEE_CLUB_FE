@@ -26,7 +26,7 @@ const badges = [
   '만세전파',
 ];
 const sparkles = new Set([1, 5, 12]);
-// 요청된 '획득 일부' 디자인 예시입니다. 서버의 배지 지급 내역은 변경하지 않습니다.
+// 배지 이미지는 도감 목록에만 사용하며 실제 획득 이력으로 취급하지 않습니다.
 const badgeArtwork: Record<number, string> = {
   0: 'badge-help-9561a.png',
   1: 'badge-help-b62f1.png',
@@ -193,7 +193,7 @@ export function BadgesPage() {
             <header>
               <div>
                 <h2>
-                  나의 배지 <span>15</span>
+                  나의 배지 <span>{earnedCount}</span>
                 </h2>
                 <span className="badge-pill">{earnedCount} / 15 획득</span>
               </div>
