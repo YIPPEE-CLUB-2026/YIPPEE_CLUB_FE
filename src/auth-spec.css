@@ -1,0 +1,364 @@
+/* Figma 133:4925 — 구조와 치수는 와이어프레임, 색상은 위피클럽 팔레트. */
+.auth-spec .screen-header {
+  height: 76px;
+  min-height: 76px;
+  padding: 8px 20px 0;
+}
+.auth-spec .screen-header h1 {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 36px;
+}
+.auth-spec .screen-content {
+  padding: 12px 24px 24px;
+  gap: 20px;
+}
+.auth-spec .screen-content h2 {
+  font-size: 20px;
+  line-height: 1.4;
+  font-weight: 600;
+  margin: 0;
+}
+.auth-spec .wire-field,
+.auth-spec .form-stack label {
+  font-size: 14px;
+  font-weight: 600;
+  gap: 8px;
+  line-height: 17px;
+}
+.auth-spec .wire-field input,
+.auth-spec .wire-select {
+  height: 52px;
+  padding: 0 16px;
+  border-radius: 15px;
+  font-size: 16px;
+}
+.auth-spec .wire-field input::placeholder {
+  font-size: 16px;
+}
+.auth-spec .wire-field__password input {
+  padding-right: 48px;
+}
+.auth-spec .wire-field__password .icon-button {
+  top: 10px;
+  right: 12px;
+}
+.auth-spec .screen-actions {
+  gap: 8px;
+  padding: 12px 24px max(16px, env(safe-area-inset-bottom));
+}
+.auth-spec .screen-actions .button {
+  min-height: 46px;
+  height: 46px;
+  border-radius: 15px;
+  font-size: 16px;
+  padding: 0 12px;
+}
+.auth-spec .screen-content--center.auth-result {
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding-top: 36px;
+  padding-bottom: 24px;
+}
+.auth-result-mark {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #f3e1a7;
+}
+.auth-spec .auth-result p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
+.club-auth--terms .checkbox-label.info-panel {
+  height: 56px;
+  padding: 16px;
+  border-radius: 15px;
+  border: 0;
+  gap: 8px;
+  background: #f3ead3;
+}
+.club-auth--terms .checkbox-label.info-panel strong {
+  font-size: 16px;
+  font-weight: 600;
+}
+.club-auth--terms .checkbox-label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 400;
+}
+.club-auth--terms input[type="checkbox"] {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  display: grid;
+  place-items: center;
+}
+.club-auth--terms input[type="checkbox"]:checked {
+  background: var(--yippee-yellow);
+  border-color: #c79f3a;
+}
+.club-auth--terms input[type="checkbox"]:checked::after {
+  content: "";
+  background: none;
+  filter: none;
+  width: 10px;
+  height: 6px;
+  border-left: 2px solid var(--yippee-brown);
+  border-bottom: 2px solid var(--yippee-brown);
+  transform: translateY(-2px) rotate(-45deg);
+}
+.club-auth--terms .agreement-row {
+  min-height: 24px;
+  padding: 0;
+}
+.club-auth--terms .agreement-row .icon-button {
+  width: 20px;
+  height: 24px;
+  min-width: 20px;
+  min-height: 24px;
+}
+.club-auth--verification .section-heading .wire-note {
+  font-size: 12px;
+  line-height: 1.4;
+}
+.club-auth--verification .section-heading .text-button {
+  padding: 4px;
+  font-size: 12px;
+}
+.child-registration .registration-content {
+  gap: 20px;
+}
+.registration-intro p {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-muted);
+  margin: 0;
+}
+.registration-gender,
+.registration-interests {
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+.registration-gender legend,
+.registration-interests legend {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  padding: 0;
+  margin-bottom: 20px;
+}
+.registration-gender > div {
+  display: flex;
+  gap: 8px;
+}
+.registration-gender .chip,
+.registration-interests .chip {
+  height: 35px;
+  min-height: 35px;
+  padding: 8px 14px;
+  font-size: 14px;
+  line-height: 17px;
+  font-weight: 400;
+  border-radius: 17px;
+}
+.registration-age {
+  margin: 0;
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--color-muted);
+}
+.registration-interest-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.registration-interest-group + .registration-interest-group {
+  margin-top: 20px;
+}
+.registration-interest-group:nth-of-type(3) {
+  margin-top: 8px;
+}
+.registration-interests .chip:disabled {
+  color: var(--color-muted);
+  opacity: 1;
+  cursor: not-allowed;
+}
+.registration-category-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.identity-page .identity-heading {
+  font-size: 20px;
+  line-height: 1.4;
+  font-weight: 400;
+}
+.identity-page .identity-birth-group {
+  margin-top: 20px;
+}
+.identity-page .identity-phone-group {
+  margin-top: 20px;
+  gap: 8px;
+}
+.identity-page .identity-birth input:first-child {
+  flex: 0 1 186px;
+}
+.identity-page .identity-birth input[type="password"] {
+  width: 60px;
+  padding: 0 8px;
+  text-align: center;
+}
+.identity-page .identity-mask {
+  font-size: 18px;
+  letter-spacing: 0;
+  color: #aa9d89;
+  white-space: nowrap;
+}
+.identity-page .carrier-options {
+  border-radius: 10px;
+}
+.identity-page .carrier-options button {
+  height: 44px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.identity-page .identity-phone {
+  gap: 8px;
+}
+.identity-page .identity-phone input {
+  height: 48px;
+  padding: 0 12px;
+  font-size: 14px;
+  border-radius: 10px;
+}
+.identity-page .identity-phone input::placeholder {
+  font-size: 14px;
+}
+.identity-page .identity-phone .button {
+  min-height: 48px;
+  height: 48px;
+  border-radius: 10px;
+  width: 92px;
+  font-size: 14px;
+  padding: 0 8px;
+}
+.identity-page .identity-phone .button:disabled {
+  background: #eee7d9;
+  color: #b0a38b;
+}
+.identity-carrier-sheet.wire-sheet {
+  width: min(402px, 100vw);
+  max-width: 402px;
+  min-height: 224px;
+  padding: 0 20px 0;
+  border-radius: 0;
+  gap: 0;
+}
+.identity-carrier-sheet::backdrop {
+  background: rgb(255 255 255 / 90%);
+}
+.identity-carrier-sheet > .sheet-handle {
+  display: none;
+}
+.identity-carrier-sheet > .section-heading {
+  position: relative;
+  min-height: 60px;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.identity-carrier-sheet h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+.identity-carrier-sheet .section-heading > button {
+  position: absolute;
+  right: -4px;
+}
+.identity-carrier-sheet .carrier-list {
+  gap: 0;
+}
+.identity-carrier-sheet .carrier-list button {
+  min-height: 52px;
+  padding: 12px 0;
+  text-align: left;
+  font-size: 16px;
+}
+@media (max-width: 360px) {
+  .registration-gender .chip,
+  .registration-interests .chip {
+    padding-left: 11px;
+    padding-right: 11px;
+    font-size: 13px;
+  }
+  .registration-intro p {
+    font-size: 11px;
+  }
+  .identity-page .identity-mask {
+    font-size: 14px;
+  }
+  .identity-page .identity-birth {
+    gap: 6px;
+  }
+  .identity-page .identity-birth input:first-child {
+    flex: 1;
+  }
+}
+
+.social-button--google {
+  background: #fff;
+  border: 1px solid #dedbd4;
+  color: #4d443c;
+}
+.social-button--google .social-provider-mark b {
+  font:
+    700 23px/1 Arial,
+    sans-serif;
+  color: #4285f4;
+}
+.social-consents {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 22px 0;
+  font-size: 13px;
+}
+.social-consents a {
+  margin-left: auto;
+  text-decoration: underline;
+}
+
+/* 소셜 동의 팝업은 화면 양옆 여백을 확보하고 긴 약관 제목도 행 안에서 줄바꿈합니다. */
+.wire-dialog.wire-popup.social-consent-dialog {
+  width: min(354px, calc(100vw - 40px));
+  max-width: calc(100vw - 40px);
+  max-height: calc(100dvh - 48px);
+  padding: 24px;
+  border-radius: 24px;
+  box-sizing: border-box;
+}
+.social-consent-heading { display: flex; align-items: center; gap: 12px; }
+.social-consent-heading h2 { flex: 1; margin: 0; font-size: 20px; line-height: 1.4; }
+.social-consent-close { flex: 0 0 32px; width: 32px; height: 32px; padding: 0; display: grid; place-items: center; border: 0; background: transparent; color: inherit; font-size: 26px; }
+.social-consent-dialog > p { margin: 12px 0 0; font-size: 14px; line-height: 1.6; word-break: keep-all; }
+.social-consent-dialog .social-consents { margin: 24px 0; gap: 18px; }
+.social-consent-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: start; }
+.social-consent-row .checkbox-label { display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: start; gap: 9px; min-width: 0; font-size: 13px; line-height: 1.6; }
+.social-consent-row .checkbox-label input { width: 20px; height: 20px; margin: 1px 0 0; }
+.social-consent-row .checkbox-label span { min-width: 0; word-break: keep-all; overflow-wrap: anywhere; }
+.social-consent-row > a { margin: 0; font-size: 12px; line-height: 1.8; white-space: nowrap; }
+.social-consent-dialog > .button { width: 100%; min-width: 0; min-height: 48px; margin: 0; border-radius: 14px; }

@@ -1,0 +1,117 @@
+/* Figma 749:5343: preserve the original SVG geometry in a 402px tab bar. */
+.bottom-nav--figma {
+  height: calc(87px + env(safe-area-inset-bottom));
+  background: transparent;
+}
+
+.bottom-nav--figma::before {
+  content: '';
+  position: absolute;
+  inset: 18px 0 0;
+  border-radius: 24px 24px 0 0;
+  background: #fff9e9;
+}
+
+.bottom-nav--figma .nav-item {
+  width: 66px;
+  height: 87px;
+  color: var(--yippee-brown);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bottom-nav--figma .nav-item.is-active::before {
+  content: none;
+}
+
+.bottom-nav--figma .nav-item.is-active > span:last-child {
+  font-weight: 600;
+}
+
+.bottom-nav--figma .nav-item .nav-item__icon {
+  width: 66px;
+  height: 32px;
+  left: 0;
+  opacity: 1;
+  transform: none;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.bottom-nav--figma .nav-item__icon img {
+  flex: none;
+  filter: none;
+}
+
+.bottom-nav--figma .nav-item:nth-child(1) {
+  left: 10.945%;
+}
+.bottom-nav--figma .nav-item:nth-child(2) {
+  left: 27.363%;
+}
+.bottom-nav--figma .nav-item:nth-child(3) {
+  left: 49.005%;
+}
+.bottom-nav--figma .nav-item:nth-child(4) {
+  left: 69.9%;
+}
+.bottom-nav--figma .nav-item:nth-child(5) {
+  left: 89.055%;
+}
+.bottom-nav--figma .nav-item:nth-child(2) .nav-item__icon {
+  top: 24px;
+}
+.bottom-nav--figma .nav-item:nth-child(4) .nav-item__icon {
+  top: 25px;
+}
+.bottom-nav--figma .nav-item:nth-child(5) .nav-item__icon {
+  top: 26px;
+}
+
+.bottom-nav--figma .nav-item--child .nav-item__icon {
+  top: 0;
+  height: 52px;
+}
+
+.nav-star {
+  position: relative;
+  display: block;
+  width: 52px;
+  height: 52px;
+}
+
+.nav-star img {
+  position: absolute;
+}
+.nav-star__circle {
+  top: 0;
+  left: 0;
+}
+.nav-star__body {
+  top: 10.95px;
+  left: 3.14px;
+}
+.nav-star__eye--left {
+  top: 23px;
+  left: 20px;
+}
+.nav-star__eye--right {
+  top: 23px;
+  left: 30px;
+}
+.nav-star__mouth {
+  top: 26px;
+  left: 22.56px;
+  transform: rotate(180deg);
+}
+
+.app-shell:has(.bottom-nav--figma) {
+  padding-bottom: calc(87px + env(safe-area-inset-bottom));
+}
+
+.bottom-nav--figma .nav-item:focus-visible {
+  outline: 2px solid var(--yippee-brown);
+  outline-offset: -2px;
+  border-radius: 8px;
+}
