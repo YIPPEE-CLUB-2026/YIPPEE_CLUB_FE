@@ -208,7 +208,7 @@ export function AuthPage() {
             <p>집에서도 신나게 놀이해요!</p>
           </div>
           <div className="auth-social-stack">
-            {(["naver", "google", "kakao"] as const).map((provider) => (
+            {(["google", "kakao"] as const).map((provider) => (
               <button
                 type="button"
                 className={`button social-button social-button--${provider}`}
@@ -220,7 +220,7 @@ export function AuthPage() {
                     <b>G</b>
                   ) : (
                     <img
-                      src={`/assets/design/social-${provider === "naver" ? "naver" : "kakaotalk"}.svg`}
+                      src="/assets/design/social-kakaotalk.svg"
                       alt=""
                     />
                   )}
