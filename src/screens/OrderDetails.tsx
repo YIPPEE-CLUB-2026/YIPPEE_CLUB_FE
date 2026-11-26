@@ -72,6 +72,7 @@ export function OrderActivityRow({ item }: { item: Activity }) {
 }
 export function OrderDetailPage({ order: supplied }: { order?: OrderSummary }) {
   const order = useOrder(supplied);
+  const [copyMessage, setCopyMessage] = useState("");
   if (!order) return <OrderMissing />;
   return (
     <div
@@ -100,6 +101,13 @@ export function OrderDetailPage({ order: supplied }: { order?: OrderSummary }) {
           </p>
         )}
         <div className="order-info">
+          <div className="order-number-row">
+            <span>주문번호</span>
+            <span className="order-number-value"><strong>{order.id}</strong><button type="button" className="button button--small" aria-label={`주문번호 ${order.id} 복사`} onClick={async () => {
+              try { await navigator.clipboard.writeText(order.id); setCopyMessage("주문번호를 복사했어요."); }
+              catch { setCopyMessage("복사하지 못했어요. 표시된 주문번호를 직접 선택해 복사해 주세요."); }
+            }}>복사</button></span>
+          </div>
           <div>
             <span>결제일</span>
             <span>{order.date}</span>
@@ -119,6 +127,8 @@ export function OrderDetailPage({ order: supplied }: { order?: OrderSummary }) {
             <strong>{money(order.total)}</strong>
           </div>
         </div>
+        <p className="order-number-help">문의하실 때 주문번호를 함께 알려주세요.</p>
+        {copyMessage && <p role="status" className="order-number-help">{copyMessage}</p>}
       </div>
       <div className="screen-actions">
         <Link

@@ -1468,3 +1468,8 @@
   background: var(--yippee-yellow);
   border-color: var(--yippee-brown);
 }
+.order-number-label { font-size: 14px; margin-bottom: 10px; overflow-wrap: anywhere; }
+.order-number-value { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
+.order-number-value strong { user-select: all; overflow-wrap: anywhere; }
+.order-number-value .button { width: auto; flex-shrink: 0; min-width: 48px; }
+.order-number-help { font-size: 14px; line-height: 1.6; margin-top: 12px; }

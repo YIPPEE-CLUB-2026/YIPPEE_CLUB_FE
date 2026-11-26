@@ -59,6 +59,7 @@ export function OrdersPage({ orders: supplied }: { orders?: OrderSummary[] }) {
         </div>
         {filtered.map((order) => (
           <article className="order-summary" key={order.id}>
+            <p className="order-number-label">주문번호 <strong>{order.id}</strong></p>
             <div className="section-heading">
               <small>{order.date}</small>
               <span className="tag">

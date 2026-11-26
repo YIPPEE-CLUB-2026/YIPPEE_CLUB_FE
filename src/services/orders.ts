@@ -1,5 +1,6 @@
 import { apiRequest } from "../lib/api";
 import type { OrderSummary } from "../screens/OrderDetails";
+import { getActivity } from "./activities";
 
 interface OrderDetail {
   id: number;
@@ -18,10 +19,25 @@ export async function getOrder(
 ): Promise<OrderSummary> {
   if (!/^[1-9]\d*$/.test(id)) throw new Error("주문 번호를 확인해 주세요.");
   const order = await apiRequest<OrderDetail>(`/orders/${id}`, { signal });
+  // 주문의 제목·가격은 구매 당시 값을 유지하고 현재 표지 이미지만 보완합니다.
+  const images = new Map<number, Promise<string | undefined>>();
+  const items = await Promise.all(order.items.map(async (item) => {
+    if (!images.has(item.activity_id)) {
+      images.set(item.activity_id, getActivity(item.activity_id, signal)
+        .then(activity => activity.thumbnail)
+        .catch(cause => { if (signal?.aborted) throw cause; return undefined; }));
+    }
+    return {
+      id: item.activity_id, title: item.title, price: item.price,
+      thumbnail: await images.get(item.activity_id),
+      subtitle: item.plan === "rental" ? "7일 이용권" : "영구 소장",
+      category: "", duration: 0, difficulty: "easy" as const, ageYears: 0,
+    };
+  }));
   return {
     id: String(order.id),
     date: "서버에서 제공하지 않음",
-    method: "토스페이먼츠",
+    method: order.total_amount === 0 ? "무료 주문" : "토스페이먼츠",
     total: order.total_amount,
     cancelled: ["cancelled", "refunded"].includes(order.status),
     cancellable:
@@ -29,16 +45,7 @@ export async function getOrder(
       order.refund_request?.status !== "requested",
     status: order.status,
     refundRequest: order.refund_request,
-    items: order.items.map((item) => ({
-      id: item.activity_id,
-      title: item.title,
-      price: item.price,
-      subtitle: item.plan === "rental" ? "7일 이용권" : "영구 소장",
-      category: "",
-      duration: 0,
-      difficulty: "easy",
-      ageYears: 0,
-    })),
+    items,
   };
 }
 export async function listOrders(

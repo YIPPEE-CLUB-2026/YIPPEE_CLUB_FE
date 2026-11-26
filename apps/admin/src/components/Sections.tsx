@@ -25,6 +25,8 @@ import {
   type Download,
 } from "../lib/admin";
 import { Panel, Notice, Empty } from "./AdminConsole";
+import RevenueDashboard from "./RevenueDashboard";
+import Issuances from "./Issuances";
 
 function useResource<T>(path: string) {
   const [data, setData] = useState<T>();
@@ -166,6 +168,7 @@ export function Dashboard({
   ] as const;
   return (
     <>
+      <RevenueDashboard />
       <div className="stats-grid">
         {stats.map(([title, count, description, target, icon]) => (
           <button
@@ -233,7 +236,6 @@ export function Dashboard({
         >
           <div className="pending-metrics">
             {[
-              "매출 · 일 / 주 / 월",
               "전체 다운로드 수",
               "도전과제 달성률",
               "AI 자동 판정 비율",
@@ -803,9 +805,9 @@ export function Downloads() {
   const [orderId, setOrderId] = useState<number>();
   return (
     <>
+      <Issuances />
       <Notice>
-        현재 명세는 주문별 PDF 다운로드 이력을 제공합니다. 개별 발급 코드·해시
-        검색과 기한·횟수 편집은 아직 지원되지 않습니다.
+        발급 코드 검색과 주문별 다운로드 이력을 제공합니다. 코드 재발급·무효화와 기한·횟수 편집은 지원되지 않습니다.
       </Notice>
       <Panel
         title="주문별 다운로드 이력"
@@ -944,15 +946,16 @@ export function Settings() {
               true,
             ],
             ["학습지 · 카테고리", "등록 · 수정 · 파일 업로드", true],
+            ["매출 집계", "일·월·년 결제액 · 환불액 · 순매출", true],
             [
               "주문 · 환불 · 회원",
               "조회 · 상태 재확인 · 환불 · 계정 정지",
               true,
             ],
             [
-              "발급 코드 · PDF 스탬프",
-              "코드 생성 · 해시 · 위치·페이지 설정",
-              false,
+              "PDF 발급 이력",
+              "코드 정확 검색 · 회원/활동지 필터 · 다운로드 상세",
+              true,
             ],
             [
               "도전과제 · 사진 AI 검수",
@@ -960,8 +963,8 @@ export function Settings() {
               false,
             ],
             [
-              "통계 · 정산 · 역할 · 감사 로그",
-              "기간별 집계 · 역할별 권한 · 운영 이력",
+              "정산 · 역할 · 감사 로그",
+              "정산 내역 · 역할별 권한 · 운영 이력",
               false,
             ],
           ].map(([title, body, enabled]) => (
@@ -1224,6 +1227,8 @@ function ProductEditor({
   const product = typeof value === "object" ? value : undefined;
   const id = typeof value === "number" ? value : product?.id;
   const categories = useResource<Page<Category>>("/activity-categories");
+  const [purchasePrice, setPurchasePrice] = useState<string>(product ? String(product.price) : creating ? "0" : "");
+  const freeProduct = purchasePrice !== "" && Number(purchasePrice) === 0;
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   async function submit(e: FormEvent<HTMLFormElement>) {
@@ -1267,6 +1272,11 @@ function ProductEditor({
         }
       }
       if (form.get("remove_rental")) fields.rental_price = null;
+      // 무료는 소장 가격 0 + 이용권 없음으로 전송합니다. BE는 이용권 0원을 허용하지 않습니다.
+      if (fields.price === 0) {
+        if (creating) delete fields.rental_price;
+        else fields.rental_price = null;
+      }
       const visibility = form.get("is_public");
       if (visibility === "true" || visibility === "false")
         fields.is_public = visibility === "true";
@@ -1367,9 +1377,12 @@ function ProductEditor({
               min={min}
               max={max}
               name={key}
+              disabled={key === "rental_price" && freeProduct}
+              placeholder={key === "rental_price" ? freeProduct ? "무료 학습지는 이용권을 설정하지 않습니다" : "선택 · 비워두면 이용권 없음" : undefined}
+              onChange={key === "price" ? event => setPurchasePrice(event.target.value) : undefined}
               required={creating && key !== "rental_price"}
               defaultValue={
-                product?.[key] ?? (creating && key === "price" ? 0 : "")
+                key === "rental_price" && freeProduct ? "" : product?.[key] ?? (creating && key === "price" ? 0 : "")
               }
             />
           </label>

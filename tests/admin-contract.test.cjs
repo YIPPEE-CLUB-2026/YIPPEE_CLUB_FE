@@ -21,6 +21,35 @@ const json = (body, status = 200) =>
     status,
     headers: { "Content-Type": "application/json" },
   });
+
+test("sales sends exact unit/date formats and retains refund-only negative net amounts", async () => {
+  const reporting = load("apps/admin/src/lib/reporting.ts");
+  const urls = [];
+  global.fetch = async url => {
+    urls.push(String(url));
+    return json({ unit: "day", date: "2026-11-25", timezone: "Asia/Seoul", paid_amount: 0, refund_amount: 2900, net_amount: -2900, paid_count: 0, refund_count: 1, buckets: [{ key: 0, paid_amount: 0, refund_amount: 2900, net_amount: -2900 }] });
+  };
+  const result = await reporting.getSales("day", "2026-11-25");
+  await reporting.getSales("month", "2026-11-25");
+  await reporting.getSales("year", "2026-11-25");
+  assert.deepEqual(urls, ["/api/v1/admin/sales?unit=day&date=2026-11-25", "/api/v1/admin/sales?unit=month&date=2026-11", "/api/v1/admin/sales?unit=year&date=2026"]);
+  assert.equal(result.buckets[0].net_amount, -2900);
+});
+
+test("issuance search encodes exact codes and preserves nullable order and download fields", async () => {
+  const reporting = load("apps/admin/src/lib/reporting.ts");
+  const urls = [];
+  global.fetch = async url => {
+    urls.push(String(url));
+    return json({ count: 1, results: [{ id: 5, issuance_code: "W0007-K7WX-9M4R-Q2TV", right: "free", order_id: null, last_downloaded_at: null }] });
+  };
+  const result = await reporting.getIssuances({code: " W0007-K7WX-9M4R-Q2TV ", user_id: "12", activity_id: "7", page: 2});
+  assert.equal(urls[0], "/api/v1/admin/worksheet-issuances?page=2&page_size=20&code=W0007-K7WX-9M4R-Q2TV&user_id=12&activity_id=7");
+  assert.equal(result.results[0].order_id, null);
+  assert.equal(result.results[0].last_downloaded_at, null);
+  await reporting.getIssuance(5);
+  assert.equal(urls[1], "/api/v1/admin/worksheet-issuances/5");
+});
 beforeEach(() => {
   const storage = new Map();
   global.sessionStorage = {

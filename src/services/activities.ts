@@ -1,4 +1,4 @@
-import { apiRequest, resolveApiFileUrl } from "../lib/api";
+import { apiRequest, ApiError, resolveApiFileUrl } from "../lib/api";
 
 import type { Activity, Paginated } from "../types";
 
@@ -138,9 +138,17 @@ export async function listPurchases(signal?: AbortSignal): Promise<Activity[]> {
   }
 }
 export async function getDownload(id: number, signal?: AbortSignal) {
-  return apiRequest<{
+  try {
+  return await apiRequest<{
     download_url: string;
     expires_at: string;
     file_name: string;
+    issuance_code: string;
   }>(`/activities/${id}/download`, { method: "POST", signal });
+  } catch (cause) {
+    if (cause instanceof ApiError && cause.code === "PDF_GENERATION_FAILED") {
+      cause.message = "고유코드가 포함된 PDF를 만들지 못했어요. 잠시 후 다시 시도해 주세요.";
+    }
+    throw cause;
+  }
 }
