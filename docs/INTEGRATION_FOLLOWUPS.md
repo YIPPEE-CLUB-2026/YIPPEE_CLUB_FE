@@ -1,5 +1,29 @@
 # 연동 확인 및 후속 작업
 
+## 2026-11-26: CORS 개발·운영 주소 동시 허용
+
+- 개발 고객 localhost:3000 요청에서 403 Invalid CORS request 확인.
+- 운영과 로컬은 동시에 허용 가능. 기존 목록을 교체해 다른 출처를 누락하지 않도록 주의.
+- BE 요청: 다음 목록을 CORS_ALLOWED_ORIGINS에 설정 후 재시작.
+
+```env
+CORS_ALLOWED_ORIGINS=https://www.yippeclub.com,https://yippeclub.com,http://localhost:3000,http://127.0.0.1:3000,http://localhost:3100,http://127.0.0.1:3100,https://admin.yippeclub.com
+```
+
+- 마지막 admin 도메인은 관리자 별도 배포용. Pages 기본 도메인에서 먼저 테스트한다면 해당 정확한 HTTPS origin도 추가.
+- CORS 설정은 관리자 권한 부여가 아님. 관리자 API는 기존 토큰·ADMIN_EMAILS 검사를 유지.
+
+## 2026-11-26: 신규 가입 부모·아이 정보 입력
+
+- 일반 가입 성공과 소셜 응답 `is_new_user: true`는 `/signup/parent`로 이동.
+- 부모 이름·닉네임은 PATCH /users/me에 저장하고 이메일은 로그인 프로필을 읽기 전용으로 표시.
+- 부모 저장 성공 후 `/signup/child`에서 기존 POST /children 저장 흐름 사용. 아이 등록은 나중에 하기 가능.
+- 기존 회원 로그인은 원래 returnPath를 유지. 로그인할 때마다 가입 폼을 띄우지 않음.
+- 부모/아이 정보 입력 배경은 사용자 요청으로 흰색 적용.
+- 사용자 승인: 현재 지원 항목 우선 연결. 부모 관계·연령대는 BE 저장 필드 추가 후 연결 예정.
+- 본인인증 이름 자동 입력 API가 없어 이름은 직접 입력. 실제 본인인증을 완료했다는 문구는 사용하지 않음.
+- 재로그인 시 미완료 가입 단계를 복구하는 서버 플래그는 현재 없음. 필요하면 onboarding 상태 API 협의.
+
 ## 2026-11-26: PDF 다운로드 횟수 집계
 
 - 현상: 사용자는 내려받기를 한 번 눌렀지만 관리자 발급 이력에 2회 표시.

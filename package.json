@@ -10,6 +10,7 @@
     "test": "node --test tests/*.test.cjs",
     "admin:dev": "npm --prefix apps/admin run dev",
     "admin:build": "npm --prefix apps/admin run build",
+    "admin:build:pages": "node scripts/build-admin-pages.cjs",
     "admin:typecheck": "npm --prefix apps/admin run typecheck",
     "build:pages": "node scripts/build-pages.cjs"
   },
