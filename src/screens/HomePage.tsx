@@ -11,6 +11,7 @@ import { GuideViewer } from "../components/GuideViewer";
 import { PlayCategoryIcon } from "../components/PlayCategoryIcon";
 import { useAuth } from "../context/AuthContext";
 import { useChildren } from "../context/ChildrenContext";
+import { ServiceFooter } from "../components/ServiceFooter";
 
 export interface CatalogProps {
   activities: Activity[];
@@ -339,6 +340,7 @@ export function HomePage({ activities, savedIds, onToggle }: CatalogProps) {
           </HorizontalRail>
         </section>
       </div>
+      <ServiceFooter />
       {["how-to", "badges"].includes(params.get("guide") || "") && (
         <GuideViewer
           kind={params.get("guide") === "badges" ? "badges" : "how-to"}

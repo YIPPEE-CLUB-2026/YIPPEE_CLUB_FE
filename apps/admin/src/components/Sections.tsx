@@ -1164,7 +1164,7 @@ export function Products() {
                           ? "미판매"
                           : money(row.rental_price)}
                       </td>
-                      <td>{row.difficulty === "easy" ? "쉬움" : "어려움"}</td>
+                      <td>{{ easy: "하", normal: "중", hard: "상" }[row.difficulty]}</td>
                       <td>
                         <button
                           className="text-link"
@@ -1394,8 +1394,9 @@ function ProductEditor({
             defaultValue={product?.difficulty || (creating ? "easy" : "")}
           >
             {!creating && <option value="">변경하지 않음</option>}
-            <option value="easy">쉬움</option>
-            <option value="hard">어려움</option>
+            <option value="easy">하</option>
+            <option value="normal">중</option>
+            <option value="hard">상</option>
           </select>
         </label>
         <label>

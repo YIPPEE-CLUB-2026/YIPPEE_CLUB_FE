@@ -1,4 +1,5 @@
 import { SocialCallbackPage } from "./screens/SocialCallbackPage";
+import { ParentRegistrationPage } from "./screens/ParentRegistrationPage";
 import { useEffect, useState } from "react";
 import { showToast } from "./components/Toast";
 import { CardsPage } from "./screens/CardsPage";
@@ -178,7 +179,7 @@ export function App() {
   if (!ready) return <LoadingState />;
 
   const privatePath =
-    /^\/(?:orders|viewer|children|signup\/child|saved|cart|checkout|profile\/edit|settings\/(?:password|withdraw)|activities\/[^/]+\/(?:record|reviews\/new))(?:\/|$)/.test(
+    /^\/(?:orders|viewer|children|signup\/(?:parent|child)|saved|cart|checkout|profile\/edit|settings\/(?:password|withdraw)|activities\/[^/]+\/(?:record|reviews\/new))(?:\/|$)/.test(
       pathname,
     );
   if (!user && sessionError && readTokens() && privatePath)
@@ -304,7 +305,8 @@ export function App() {
           />
           <Route path="children" element={<ChildrenPage />} />
           <Route path="children/new" element={<ChildFormPage key="new" />} />
-          <Route path="signup/child" element={<ChildRegistrationPage />} />
+          <Route path="signup/parent" element={<ParentRegistrationPage />} />
+          <Route path="signup/child" element={<ChildRegistrationPage onboarding />} />
           <Route
             path="children/:childId/edit"
             element={<ChildFormPage key={pathname} />}

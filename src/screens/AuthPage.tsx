@@ -129,7 +129,7 @@ export function AuthPage() {
           throw new Error("영문과 숫자를 포함해 8자 이상 입력해 주세요.");
         if (!proof) throw new Error("이메일 인증을 먼저 완료해 주세요.");
         await establish(await signup(email, password, proof, agreements));
-        setStep("complete");
+        navigate("/signup/parent", { replace: true });
       } else if (step === "verification") {
         let token = proof;
         if (!token) {
@@ -275,8 +275,8 @@ export function AuthPage() {
             </p>
           </div>
           <div className="screen-actions">
-            <Link className="button button--primary" to="/signup/child" replace>
-              아이 등록하기
+            <Link className="button button--primary" to="/signup/parent" replace>
+              부모 정보 입력하기
             </Link>
             <Link className="button" to="/" replace>
               먼저 둘러보기

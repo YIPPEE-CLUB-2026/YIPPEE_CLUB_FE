@@ -11,6 +11,7 @@ import { SearchField } from '../components/SearchField';
 import { WireDialog } from '../components/WireDialog';
 import { Icon } from '../components/Icon';
 import type { Inquiry } from './InquiryDetailPage';
+import { PolicyPage } from './PolicyPage';
 
 export function FAQPage() {
   const [params, setParams] = useSearchParams();
@@ -311,6 +312,7 @@ export function TextDocumentPage() {
   const { type } = useParams();
   const { pathname } = useLocation();
   const notice = pathname.startsWith('/notices/');
+  if (!notice) return <PolicyPage type={type || 'terms'} />;
   const title = notice
     ? '공지사항'
     : (

@@ -36,9 +36,11 @@ const interestCodes: Record<string, string> = {
 export function ChildRegistrationPage({
   editId,
   mode = 'register',
+  onboarding = false,
 }: {
   editId?: string;
   mode?: 'register' | 'add';
+  onboarding?: boolean;
 }) {
   const { save } = useChildren();
   const { isPreview } = useAuth();
@@ -157,7 +159,7 @@ export function ChildRegistrationPage({
       await save(data, editId ? Number(editId) : undefined);
       if (editId) showToast('아이 정보를 저장했어요', '124:4004');
       if (!editId && mode === 'add') setCreated(true);
-      else navigate('/children', { replace: true });
+      else navigate(onboarding ? '/' : '/children', { replace: true });
     } catch (cause) {
       setError((cause as Error).message);
     } finally {
@@ -201,7 +203,7 @@ export function ChildRegistrationPage({
     );
   return (
     <form
-      className={`screen auth-spec child-registration ${editId ? 'child-registration--edit' : ''}`}
+      className={`screen auth-spec child-registration ${onboarding ? 'signup-profile' : ''} ${editId ? 'child-registration--edit' : ''}`}
       onSubmit={submit}
       data-figma-node={
         editId ? '124:3956' : mode === 'add' ? '117:1274' : '118:1715'

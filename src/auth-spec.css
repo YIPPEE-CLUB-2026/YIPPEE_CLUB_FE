@@ -362,3 +362,17 @@
 .social-consent-row .checkbox-label span { min-width: 0; word-break: keep-all; overflow-wrap: anywhere; }
 .social-consent-row > a { margin: 0; font-size: 12px; line-height: 1.8; white-space: nowrap; }
 .social-consent-dialog > .button { width: 100%; min-width: 0; min-height: 48px; margin: 0; border-radius: 14px; }
+/* 가입 정보 입력: Figma 폼 구성을 따르되 사용자 요청에 따라 흰 배경 적용. */
+.signup-profile { --color-surface: #fff; background: #fff; }
+.signup-profile .screen-header, .signup-profile .screen-actions,
+.signup-profile .screen-content, .signup-profile .wire-field input,
+.signup-profile .wire-select, .signup-profile .chip:not(.is-selected) { background-color: #fff; }
+.parent-registration .registration-content { display: flex; flex-direction: column; gap: 20px; padding: 12px 24px 24px; }
+.signup-profile .registration-intro h2 { font-size: 20px; line-height: 1.4; margin: 0; }
+.signup-profile .registration-intro p { font-size: 12px; line-height: 1.4; margin-top: 4px; font-weight: 400; }
+.parent-registration .wire-field { display: flex; flex-direction: column; gap: 8px; }
+.parent-registration .wire-field input { width: 100%; min-width: 0; height: 52px; border-radius: 15px; padding: 0 16px; font-size: 16px; }
+.parent-registration .wire-field input[readonly] { background: #f7f5f2; }
+.parent-registration .wire-field small { font-size: 12px; line-height: 1.5; color: var(--color-muted); }
+.signup-profile .screen-actions { padding: 12px 24px 16px; }
+.signup-profile .screen-actions .button { min-height: 46px; border-radius: 15px; }

@@ -10,6 +10,7 @@ import type { Activity } from "../types";
 export function ViewerPage() {
   const { activityId } = useParams();
   const [activity, setActivity] = useState<Activity>();
+  const [fileName, setFileName] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [tab, setTab] = useState("activity");
@@ -23,12 +24,15 @@ export function ViewerPage() {
     setLoading(true);
     setError("");
     setActivity(undefined);
+    setFileName('');
     setZoom(100);
     setTab("activity");
     let previewUrl: string | undefined;
     getActivity(Number(activityId), controller.signal)
       .then(async (item) => {
+        if (controller.signal.aborted) return;
         const file = await getDownload(item.id, controller.signal);
+        if (controller.signal.aborted) return;
         const response = await fetch(resolveApiFileUrl(file.download_url), {
           signal: controller.signal,
         });
@@ -40,6 +44,7 @@ export function ViewerPage() {
         if (!controller.signal.aborted) {
           previewUrl = URL.createObjectURL(blob);
           setActivity({ ...item, pdf: previewUrl });
+          setFileName(file.file_name);
         }
       })
       .catch((cause: Error) => {
@@ -59,17 +64,6 @@ export function ViewerPage() {
       : activity?.pdf?.startsWith("/") && !activity.pdf.startsWith("//")
         ? activity.pdf
         : "";
-  async function downloadFile(event: React.MouseEvent<HTMLAnchorElement>) {
-    event.preventDefault();
-    try {
-      const file = await getDownload(Number(activityId));
-      window.location.assign(resolveApiFileUrl(file.download_url));
-    } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : "파일을 내려받지 못했어요.",
-      );
-    }
-  }
   const preview = (
     <div
       className="document-viewer__paper"
@@ -196,9 +190,8 @@ export function ViewerPage() {
                     href={pdf}
                     target="_blank"
                     rel="noreferrer"
-                    download
+                    download={fileName}
                     aria-label="활동지 내려받기"
-                    onClick={(event) => void downloadFile(event)}
                   >
                     <Icon name="download" />
                   </a>

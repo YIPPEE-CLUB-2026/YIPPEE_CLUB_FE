@@ -41,7 +41,7 @@ export function SocialCallbackPage() {
         if (!active) return;
         await establish(result);
         if (active)
-          navigate(result.is_new_user ? "/signup/child" : returnPath, {
+          navigate(result.is_new_user ? "/signup/parent" : returnPath, {
             replace: true,
           });
       })

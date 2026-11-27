@@ -15,7 +15,7 @@ export interface Product {
   rental_price: number | null;
   age_min_months: number;
   age_max_months: number;
-  difficulty: "easy" | "hard";
+  difficulty: "easy" | "normal" | "hard";
   duration_min: number;
   duration_max: number;
   categories: number[];

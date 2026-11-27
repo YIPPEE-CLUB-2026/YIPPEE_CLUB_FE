@@ -7,7 +7,7 @@ import { WireDialog } from '../components/WireDialog';
 import { Icon } from '../components/Icon';
 import { ActivityCard } from '../components/ActivityCard';
 import { showToast } from '../components/Toast';
-import { getActivity, listCart } from '../services/activities';
+import { getActivity, listCart, listPurchases } from '../services/activities';
 import type { Activity } from '../types';
 import type { CatalogProps } from './HomePage';
 
@@ -230,6 +230,31 @@ export function ActivityDetailPage({
   const [activity, setActivity] = useState<Activity>();
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
+  const [purchaseAccess, setPurchaseAccess] = useState<{
+    userId: number; activityId: string; owned: boolean; error: boolean;
+  }>();
+  const [accessRetry, setAccessRetry] = useState(0);
+  useEffect(() => {
+    setPurchaseAccess(undefined);
+    if (!user || !activityId) return;
+    const controller = new AbortController();
+    listPurchases(controller.signal)
+      .then((items) => {
+        if (!controller.signal.aborted) setPurchaseAccess({
+          userId: user.id, activityId,
+          owned: items.some((item) => item.id === Number(activityId) && item.expired === false),
+          error: false,
+        });
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setPurchaseAccess({ userId: user.id, activityId, owned: false, error: true });
+      });
+    return () => controller.abort();
+  }, [user?.id, activityId, accessRetry]);
+  const currentAccess = purchaseAccess?.userId === user?.id && purchaseAccess?.activityId === activityId
+    ? purchaseAccess : undefined;
+  const checkingAccess = Boolean(user) && !currentAccess;
+  const owned = currentAccess?.owned === true;
   useEffect(() => {
     const controller = new AbortController();
     setActivity(undefined);
@@ -416,20 +441,23 @@ export function ActivityDetailPage({
               </button>
               <button
                 className="button"
-                disabled={busy}
+                disabled={busy || checkingAccess || owned || currentAccess?.error}
                 onClick={() => void add()}
               >
                 장바구니
               </button>
               <button
                 className="button button--primary"
-                onClick={() =>
+                disabled={checkingAccess}
+                onClick={() => {
+                  if (currentAccess?.error) { setAccessRetry((value) => value + 1); return; }
+                  if (owned) { navigate(`/viewer/${activity.id}`); return; }
                   navigate('/checkout', {
                     state: { activityIds: [activity.id] },
-                  })
-                }
+                  });
+                }}
               >
-                바로 구매
+                {checkingAccess ? '구매 확인 중…' : currentAccess?.error ? '구매 확인 재시도' : owned ? '다운로드' : '바로 구매'}
               </button>
             </div>
           </div>
