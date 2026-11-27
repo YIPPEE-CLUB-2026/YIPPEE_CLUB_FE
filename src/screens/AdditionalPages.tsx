@@ -1,4 +1,5 @@
 import { GuideViewer } from '../components/GuideViewer';
+import { parentGuides } from '../data/parent-guides';
 import { useState } from 'react';
 import {
   Link,
@@ -162,7 +163,6 @@ export function ActivityTypesPage() {
             그림으로 마음껏 표현하고 색칠도구를 다양하게 활용해요.
           </p>
         )}
-        <div className="activity-type-hero" />
         <h2>연령에 따라 이렇게 놀 수 있어요</h2>
         {['만 1~2세', '만 3~4세', '만 5세'].map((age, index) => (
           <section className="age-guide" key={age}>
@@ -191,10 +191,13 @@ export function ActivityTypesPage() {
                 </p>
               </>
             ) : (
-              <>
-                <span className="skeleton-line" />
-                <span className="skeleton-line" />
-              </>
+              <p>• {category === '만들기' ? ['종이를 손으로 찢어 함께 붙여봐요.', '상자나 종이를 접어 좋아하는 모양을 만들어봐요.', '만들고 싶은 것을 정하고 재료를 골라봐요.'][index]
+                : category === '한글' ? ['그림을 보며 익숙한 낱말을 이야기해요.', '좋아하는 물건의 이름을 함께 찾아봐요.', '짧은 낱말을 써서 그림과 연결해요.'][index]
+                : category === '숫자' ? ['장난감을 하나씩 함께 세어봐요.', '같은 수의 물건끼리 짝을 지어봐요.', '주사위를 굴려 나온 수만큼 움직여봐요.'][index]
+                : category === '역할' ? ['인형에게 인사를 건네봐요.', '가게 손님과 주인이 되어봐요.', '함께 역할을 나누고 이야기를 이어가요.'][index]
+                : category === '영어' ? ['그림을 보며 짧은 인사를 들어봐요.', '익숙한 물건 이름을 함께 말해봐요.', '짧은 표현을 역할놀이에 넣어봐요.'][index]
+                : category === '음악' ? ['좋아하는 노래에 맞춰 손뼉을 쳐요.', '빠르고 느린 리듬을 몸으로 표현해요.', '생활 속 소리로 짧은 리듬을 만들어봐요.'][index]
+                : ['안전한 공간에서 보호자와 가볍게 움직여요.', '바닥의 선을 따라 천천히 걸어봐요.', '공 굴리기나 간단한 동작을 번갈아 해봐요.'][index]}</p>
             )}
           </section>
         ))}
@@ -215,10 +218,7 @@ export function GuidesPage() {
   const [params, setParams] = useSearchParams();
   const [expanded, setExpanded] = useState(false);
   const selectedCategory = params.get('category');
-  const guideItems = [
-    { id: 1, title: '낯가리는 아이', category: '사회성' },
-    { id: 2, title: '약속하기 연습', category: '생활습관' },
-  ];
+  const guideItems = parentGuides;
   const items = guideItems.filter(
     (item) =>
       !selectedCategory ||
@@ -269,7 +269,7 @@ export function GuidesPage() {
         )}
         {items.map(({ title, id }) => (
           <Link className="guide-row" key={title} to={`/guides/${id}`}>
-            <span className="guide-row__thumbnail" />
+            <span className="guide-row__thumbnail guide-row__label" aria-hidden="true">가이드</span>
             <span>{title}</span>
           </Link>
         ))}
@@ -291,6 +291,8 @@ export function GuidesPage() {
 export function GuideDetailPage() {
   const { guideId } = useParams();
   const [notice, setNotice] = useState(false);
+  const guide = parentGuides.find(item => item.id === guideId);
+  if (!guide) return <div className="screen"><ScreenHeader title="가이드북" backTo="/guides" /><div className="screen-content"><p>해당 가이드를 찾을 수 없어요.</p><Link to="/guides">목록으로</Link></div></div>;
   return (
     <div className="screen wire-guide-detail" data-figma-node="117:1183">
       <ScreenHeader
@@ -306,35 +308,20 @@ export function GuideDetailPage() {
           </button>
         }
       />
-      <div className="guide-detail-hero" />
       <div className="screen-content">
-        <span className="tag guide-read-time">5분 읽기</span>
+        <span className="tag guide-read-time">{guide.category} · 부모 놀이 가이드</span>
         <h1 className="guide-detail-title">
-          {guideId === '2' ? '약속하기 연습' : '낯가리는 아이'}
+          {guide.title}
         </h1>
-        <div className="skeleton-paragraph">
-          <span />
-          <span />
-          <span />
-        </div>
-        <h2>이렇게 도와주세요</h2>
-        <div className="skeleton-paragraph">
-          <span />
-          <span />
-          <span />
-        </div>
+        <article className="parent-guide-copy"><p>{guide.intro}</p>{guide.sections.map(([title, body]) => <section key={title}><h2>{title}</h2><p>{body}</p></section>)}</article>
         <div className="section-heading">
-          <Link className="text-button" to="/guides/1">
-            이전 글
-          </Link>
-          <Link className="text-button" to="/guides/2">
-            다음 글
-          </Link>
+          <Link className="text-button" to="/guides">목록으로</Link>
+          <Link className="text-button" to={guide.id === '1' ? '/guides/2' : '/guides/1'}>다른 가이드 보기</Link>
         </div>
       </div>
       <div className="screen-actions">
         <Link className="button button--primary" to="/activities">
-          관련 활동지 보기
+          활동지 둘러보기
         </Link>
       </div>
       {notice && (
@@ -485,7 +472,7 @@ export function NotificationSettingsPage() {
           <p>
             {blocked
               ? '브라우저의 사이트 설정에서 알림을 허용해 주세요.'
-              : '알림 설정 저장 기능을 준비하고 있어요.'}
+              : '알림 설정은 아직 저장되지 않아요. 현재 기기나 계정에 적용되지 않습니다.'}
           </p>
           <button
             className="button button--primary"

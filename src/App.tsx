@@ -1,8 +1,8 @@
 import { SocialCallbackPage } from "./screens/SocialCallbackPage";
+import { FeatureNotice, UnavailablePage } from './components/FeatureNotice';
 import { ParentRegistrationPage } from "./screens/ParentRegistrationPage";
 import { useEffect, useState } from "react";
 import { showToast } from "./components/Toast";
-import { CardsPage } from "./screens/CardsPage";
 import {
   CheckoutPage,
   PaymentResultPage,
@@ -39,7 +39,6 @@ import { IdentityPage } from "./screens/IdentityPage";
 import { ActivityWritePage } from "./screens/ActivityWritePage";
 import {
   ReferenceRecommendationsPage as RecommendationsPage,
-  ReferenceAccountInfoPage,
 } from "./screens/ReferenceScreens";
 import {
   BadgesPage,
@@ -65,7 +64,6 @@ import {
   InquiryHistoryPage,
   NoticesPage,
   TextDocumentPage,
-  AccountFormPage,
 } from "./screens/SupportSubPages";
 import {
   OnboardingPage,
@@ -177,6 +175,7 @@ export function App() {
     pathname === "/saved";
 
   if (!ready) return <LoadingState />;
+  if (needsCatalog && loading) return <LoadingState label="활동지를 불러오는 중…" />;
 
   const privatePath =
     /^\/(?:orders|viewer|children|signup\/(?:parent|child)|saved|cart|checkout|profile\/edit|settings\/(?:password|withdraw)|activities\/[^/]+\/(?:record|reviews\/new))(?:\/|$)/.test(
@@ -235,6 +234,10 @@ export function App() {
         </div>
       )}
       <SystemFeedback />
+      {(/^\/(?:cash|points|coupons)(?:\/|$)/.test(pathname)) && <FeatureNotice message="캐시·쿠폰·포인트 기능은 준비 중이에요. 현재 표시된 잔액·내역은 실제 조회 결과가 아니며 충전·지급·사용은 처리되지 않아요." />}
+      {(/^\/support\/inquiries(?:\/|$)/.test(pathname)) && <FeatureNotice message="사이트 내 문의 접수·답변 기능을 준비 중이에요. 문의는 yip2e2club.official@gmail.com으로 보내 주세요." />}
+      {pathname === '/notifications' && <FeatureNotice message="알림 조회·읽음·삭제 기능을 준비 중이에요. 현재 알림 목록은 실제 수신 내역이 아니에요." />}
+      {/^\/activities\/[^/]+\/(?:record|reviews(?:\/new)?)$/.test(pathname) && <FeatureNotice message="리뷰·활동 인증 저장과 조회는 준비 중이에요. 입력한 내용과 사진은 서버에 등록되지 않아요." />}
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<HomePage {...catalogProps} />} />
@@ -337,9 +340,9 @@ export function App() {
           <Route path="orders/:orderId" element={<OrderDetailPage />} />
           <Route path="orders/:orderId/cancel" element={<OrderCancelPage />} />
           <Route path="orders/:orderId/receipt" element={<ReceiptPage />} />
-          <Route path="records" element={<EmptyScreen kind="records" />} />
+          <Route path="records" element={<UnavailablePage title="활동 기록" message="활동 인증·기록 저장 기능을 준비 중이에요. 현재는 활동을 완료해도 기록이 쌓이지 않아요." />} />
           <Route path="reports/growth" element={<GrowthReportPage />} />
-          <Route path="cards" element={<CardsPage />} />
+          <Route path="cards" element={<UnavailablePage title="결제 카드 관리" message="카드 저장·기본 카드 설정은 준비 중이에요. 활동지 결제 시 토스 결제창에서 결제 수단을 선택해 주세요." />} />
           <Route path="coupons" element={<CouponsPage />} />
           <Route path="coupons/:couponId" element={<CouponDetailPage />} />
           <Route path="cash" element={<WalletPage kind="cash" />} />
@@ -347,11 +350,11 @@ export function App() {
           <Route path="points" element={<WalletPage kind="points" />} />
           <Route
             path="settings/bank-account"
-            element={<ReferenceAccountInfoPage />}
+            element={<UnavailablePage title="계좌 정보" message="계좌 정보 등록·조회 기능을 준비 중이에요. 고객센터로 문의해 주세요." />}
           />
           <Route
             path="settings/contracts"
-            element={<ReferenceAccountInfoPage contract />}
+            element={<UnavailablePage title="계약 정보" message="계약 정보 조회 기능을 준비 중이에요. 고객센터로 문의해 주세요." />}
           />
           <Route path="settings" element={<SettingsPage />} />
           <Route
@@ -370,7 +373,7 @@ export function App() {
           <Route path="notices/:noticeId" element={<TextDocumentPage />} />
           <Route path="policies/:type" element={<TextDocumentPage />} />
           <Route path="notifications" element={<NotificationsPage />} />
-          <Route path="cards/new" element={<AccountFormPage kind="card" />} />
+          <Route path="cards/new" element={<UnavailablePage title="카드 추가" message="카드 등록 기능은 준비 중이며 카드 정보를 입력받지 않아요. 실제 결제는 토스 결제창에서 진행해 주세요." />} />
           <Route path="settings/password" element={<PasswordChangePage />} />
           <Route path="password/changed" element={<PasswordChangedPage />} />
           <Route path="settings/phone" element={<PhoneChangePage />} />

@@ -164,7 +164,7 @@ export function ReviewsPage({
       ) : (
         <div className="screen-content screen-content--center">
           <div className="empty-circle" />
-          <h2>아직 리뷰가 없어요</h2>
+          <h2>리뷰 기능을 준비 중이에요</h2>
           <p>
             아이와 놀이 후<br />첫 번째 리뷰를 남겨 주세요.
           </p>

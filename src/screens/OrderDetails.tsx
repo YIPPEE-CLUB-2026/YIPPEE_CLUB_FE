@@ -6,6 +6,7 @@ import { WireDialog } from "../components/WireDialog";
 import { Icon } from "../components/Icon";
 import type { Activity } from "../types";
 import { ActivityThumbnail } from "../components/ActivityThumbnail";
+import { LoadingState } from "../components/LoadingState";
 
 export interface OrderSummary {
   id: string;
@@ -25,25 +26,31 @@ export interface OrderSummary {
 function useOrder(provided?: OrderSummary) {
   const { orderId } = useParams();
   const [order, setOrder] = useState<OrderSummary>();
+  const [loading, setLoading] = useState(!provided);
+  const [error, setError] = useState("");
   useEffect(() => {
     const controller = new AbortController();
     setOrder(undefined);
-    if (orderId)
+    setError("");
+    setLoading(Boolean(orderId && !provided));
+    if (orderId && !provided)
       getOrder(orderId, controller.signal)
-        .then(setOrder)
-        .catch(() => {});
+        .then((row) => { if (!controller.signal.aborted) setOrder(row); })
+        .catch((cause: Error) => { if (!controller.signal.aborted) setError(cause.message); })
+        .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
-  }, [orderId]);
-  return provided || order;
+  }, [orderId, provided]);
+  return { order: provided || order, loading: !provided && loading, error };
 }
 const money = (value: number) => `${value.toLocaleString("ko-KR")}원`;
-function OrderMissing() {
+function OrderMissing({ error }: { error?: string }) {
   return (
     <div className="screen">
       <ScreenHeader title="결제 내역" backTo="/orders" />
       <div className="screen-content screen-content--center">
         <div className="empty-circle" />
-        <h2>결제 내역을 찾을 수 없어요</h2>
+        <h2>{error ? '결제 내역을 불러오지 못했어요' : '결제 내역을 찾을 수 없어요'}</h2>
+        {error && <p role="alert">{error}</p>}
         <p>결제 내역에서 다시 확인해 주세요.</p>
       </div>
       <div className="screen-actions">
@@ -71,9 +78,10 @@ export function OrderActivityRow({ item }: { item: Activity }) {
   );
 }
 export function OrderDetailPage({ order: supplied }: { order?: OrderSummary }) {
-  const order = useOrder(supplied);
+  const { order, loading, error } = useOrder(supplied);
   const [copyMessage, setCopyMessage] = useState("");
-  if (!order) return <OrderMissing />;
+  if (loading) return <LoadingState label="주문 정보를 불러오는 중…" />;
+  if (!order) return <OrderMissing error={error} />;
   return (
     <div
       className="screen wire-order-detail"
@@ -151,14 +159,15 @@ export function OrderDetailPage({ order: supplied }: { order?: OrderSummary }) {
   );
 }
 export function OrderCancelPage({ order: supplied }: { order?: OrderSummary }) {
-  const order = useOrder(supplied);
+  const { order, loading, error } = useOrder(supplied);
   const navigate = useNavigate();
   const [cancelError, setCancelError] = useState("");
   const [cancelBusy, setCancelBusy] = useState(false);
   const [reason, setReason] = useState("");
   const [confirm, setConfirm] = useState(false);
   const [notice, setNotice] = useState(false);
-  if (!order) return <OrderMissing />;
+  if (loading) return <LoadingState label="주문 정보를 불러오는 중…" />;
+  if (!order) return <OrderMissing error={error} />;
   return (
     <div
       className="screen wire-order-cancel"
@@ -254,11 +263,12 @@ export function OrderCancelPage({ order: supplied }: { order?: OrderSummary }) {
   );
 }
 export function ReceiptPage({ order: supplied }: { order?: OrderSummary }) {
-  const order = useOrder(supplied);
+  const { order, loading, error } = useOrder(supplied);
   const { orderId } = useParams();
   const [copied, setCopied] = useState(false);
   const [receiptError, setReceiptError] = useState("");
-  if (!order) return <OrderMissing />;
+  if (loading) return <LoadingState label="주문 정보를 불러오는 중…" />;
+  if (!order) return <OrderMissing error={error} />;
   return (
     <div className="screen wire-receipt" data-figma-node="123:4105">
       <ScreenHeader

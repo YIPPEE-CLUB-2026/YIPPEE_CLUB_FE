@@ -8,6 +8,7 @@ import { LoginPrompt } from './ConnectedPages';
 import { childAgeLabel } from '../lib/date';
 import { ChildRegistrationPage } from './ChildRegistrationPage';
 import { ScreenHeader } from '../components/ScreenHeader';
+import { LoadingState } from '../components/LoadingState';
 
 export function ChildrenPage() {
   const { user } = useAuth();
@@ -30,9 +31,7 @@ export function ChildrenPage() {
       {!user ? (
         <LoginPrompt />
       ) : loading ? (
-        <div className="screen-content">
-          <p role="status">불러오는 중…</p>
-        </div>
+        <LoadingState inline label="아이 정보를 불러오고 있어요" />
       ) : error ? (
         <div className="screen-content">
           <p role="alert">{error}</p>

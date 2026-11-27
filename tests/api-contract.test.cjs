@@ -21,6 +21,46 @@ const json = (value, status = 200) =>
     status,
     headers: { "Content-Type": "application/json" },
   });
+
+test('rental selection is identical in the server quote and created order', async () => {
+  const payments = load('src/services/payments.ts');
+  const calls = [];
+  global.fetch = async (url, init) => {
+    calls.push({url, body: JSON.parse(init.body)});
+    return json(url.endsWith('/quote') ? {subtotal: 700, payable_amount: 700, unavailable_activity_ids: [], refund_notice: '안내'} : {order_id: 1, status: 'pending', amount: 700});
+  };
+  await payments.quoteOrder([7, 8], undefined, [7]);
+  await payments.createOrder([7, 8], true, [7]);
+  assert.deepEqual(calls[0], {url: '/api/v1/orders/quote', body: {activity_ids:[7,8], rental_activity_ids:[7]}});
+  assert.deepEqual(calls[1].body, {activity_ids:[7,8], rental_activity_ids:[7], agreed_to_payment:true, agreed_to_refund_notice:true});
+});
+
+test('customer samples use the public image endpoint without requesting a downloadable PDF', async () => {
+  const activities = load('src/services/activities.ts');
+  const calls = [];
+  global.fetch = async (url, init) => { calls.push([url, init.method || 'GET']); return json({preview_urls:['/api/v1/activities/7/previews/1?v=1']}); };
+  assert.deepEqual(await activities.getActivityPreviews(7), ['/api/v1/activities/7/previews/1?v=1']);
+  assert.deepEqual(calls, [['/api/v1/activities/7/preview', 'GET']]);
+});
+
+test('withdrawal uses the existing DELETE profile contract and propagates failure', async () => {
+  const profile = load('src/services/profile.ts');
+  const calls = [];
+  global.fetch = async (url, init) => { calls.push([url, init.method, init.body]); return json({message:'탈퇴 완료'}); };
+  await profile.withdrawAccount();
+  assert.deepEqual(calls, [['/api/v1/users/me', 'DELETE', undefined]]);
+  global.fetch = async () => json({message:'실패'}, 500);
+  await assert.rejects(profile.withdrawAccount(), error => error.status === 500);
+});
+
+test('category aliases match customer tabs without changing unrelated categories', () => {
+  const {categoryMatches} = load('src/lib/categories.ts');
+  assert.equal(categoryMatches('숫자', '수학'), true);
+  assert.equal(categoryMatches('역할', '역할 놀이'), true);
+  assert.equal(categoryMatches('음악', '노래하고 춤추기'), true);
+  assert.equal(categoryMatches('그림/색칠', '미술 놀이'), true);
+  assert.equal(categoryMatches('영어', '한글'), false);
+});
 beforeEach(() => {
   const storage = new Map();
   global.sessionStorage = {

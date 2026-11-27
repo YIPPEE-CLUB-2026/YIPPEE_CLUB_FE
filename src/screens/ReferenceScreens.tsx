@@ -61,9 +61,11 @@ export function OneClickOverlay({
     title: string,
     options: string[],
   ) {
+    const available = key === 'categories' || activities.some(item => key === 'materials' ? !!item.materials?.length : !!item.developmentDomains?.length);
     return (
-      <fieldset className="finder-fieldset">
+      <fieldset className="finder-fieldset" disabled={!available}>
         <legend>{title}</legend>
+        {!available && <small>이 조건으로 찾을 수 있는 정보가 아직 등록되지 않았어요.</small>}
         <div className="chips">
           {options.map((value) => (
             <button
@@ -174,8 +176,9 @@ export function OneClickOverlay({
               ))}
             </div>
           </fieldset>
-          <fieldset className="finder-fieldset">
+          <fieldset className="finder-fieldset" disabled={!activities.some(item => !!item.location)}>
             <legend>장소</legend>
+            {!activities.some(item => !!item.location) && <small>장소 정보가 등록되면 선택할 수 있어요.</small>}
             <div className="chips">
               {['집 안', '집 밖'].map((value) => (
                 <button

@@ -23,6 +23,9 @@ export function mergeProfileUpdate(
 export function getProfile() {
   return apiRequest<ProfileRead>("/users/me");
 }
+export function withdrawAccount() {
+  return apiRequest<{ message: string }>('/users/me', { method: 'DELETE' });
+}
 
 export function updateProfile(name: string, nickname?: string) {
   return apiRequest<Profile>("/users/me", {

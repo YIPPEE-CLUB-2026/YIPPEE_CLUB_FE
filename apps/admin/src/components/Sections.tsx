@@ -345,7 +345,7 @@ export function Orders() {
           }}
         >
           <option value="">모든 상태</option>
-          {["pending", "paid", "failed", "cancelled", "refunded", "review"].map(
+          {["pending", "paid", "payment_failed", "cancelled", "refunded", "review"].map(
             (value) => (
               <option key={value} value={value}>
                 {statusLabel[value]}

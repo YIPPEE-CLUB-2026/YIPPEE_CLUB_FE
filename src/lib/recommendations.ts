@@ -1,4 +1,5 @@
 import type { Activity } from '../types';
+import { categoryMatches } from './categories';
 export function recommendActivities(
   items: Activity[],
   child?: { birth_date: string; interests: number[] },
@@ -58,7 +59,7 @@ export function filterRecommendations(
           : item.ageYears === Number(filters.age))) &&
       (!filters.categories.length ||
         filters.categories.some((name) =>
-          (item.categoryNames || [item.category]).includes(name),
+          (item.categoryNames || [item.category]).some(category => categoryMatches(category, name)),
         )) &&
       (!filters.materials.length ||
         (!!item.materials &&

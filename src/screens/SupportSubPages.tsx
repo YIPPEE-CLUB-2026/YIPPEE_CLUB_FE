@@ -106,8 +106,8 @@ export function FAQPage() {
                         ? '저장 탭의 구매한 활동지에서 확인할 수 있어요.'
                         : index === 2
                           ? '12개월(만 1세)~72개월(만 5세)까지 이용할 수 있어요.'
-                          : index === 3
-                            ? '구매 내역에서 리뷰를 작성할 수 있어요.'
+                        : index === 3
+                            ? '리뷰 저장 기능을 준비 중이에요. 현재는 리뷰가 등록되지 않아요.'
                             : '결제 내역에서 취소 가능 여부를 확인해 주세요.'}
                   </p>
                 )}
@@ -297,12 +297,7 @@ export function NoticesPage() {
     <div className="screen" data-figma-node="124:4897">
       <ScreenHeader title="공지사항" backTo="/support" />
       <div className="screen-content">
-        {[1, 2].map((id) => (
-          <Link className="notice-card" to={`/notices/${id}`} key={id}>
-            <small>0000.00.00</small>
-            <span>공지 제목</span>
-          </Link>
-        ))}
+        <p>공지 게시 기능을 준비 중이에요. 확인할 공지가 등록되면 이곳에서 안내할 예정이에요.</p>
       </div>
     </div>
   );
@@ -313,40 +308,7 @@ export function TextDocumentPage() {
   const { pathname } = useLocation();
   const notice = pathname.startsWith('/notices/');
   if (!notice) return <PolicyPage type={type || 'terms'} />;
-  const title = notice
-    ? '공지사항'
-    : (
-        {
-          terms: '서비스 이용약관',
-          privacy: '개인정보 처리방침',
-          marketing: '마케팅 정보 수신 동의',
-          refund: '환불 정책',
-        } as Record<string, string>
-      )[type || 'terms'] || '서비스 이용약관';
-  return (
-    <div className="screen" data-figma-node={notice ? '124:4918' : '124:5062'}>
-      <ScreenHeader title={title} backTo={notice ? '/notices' : '/settings'} />
-      <div className="screen-content">
-        <h2>{notice ? '공지 제목' : title}</h2>
-        <small className="wire-note">{notice ? '' : '시행일 '}0000.00.00</small>
-        <div className="document-skeleton">
-          {Array.from({ length: notice ? 5 : 8 }, (_, index) => (
-            <span className="skeleton-line" key={index} />
-          ))}
-        </div>
-        {notice && (
-          <div className="section-heading">
-            <Link className="text-button" to="/notices/1">
-              이전 글
-            </Link>
-            <Link className="text-button" to="/notices/2">
-              다음 글
-            </Link>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+  return <div className="screen"><ScreenHeader title="공지사항" backTo="/notices" /><div className="screen-content"><p>요청하신 공지를 확인할 수 없어요.</p><Link to="/notices">공지 목록으로</Link></div></div>;
 }
 
 export function NotificationsPage() {

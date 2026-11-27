@@ -58,7 +58,10 @@ export function CheckoutPage({
       )
     : [];
   const items = activities.filter((item) => ids.includes(item.id));
-  const total = items.reduce((sum, item) => sum + item.price, 0);
+  const [rentalIds, setRentalIds] = useState<number[]>([]);
+  const activeRentalIds = rentalIds.filter(id => items.some(item => item.id === id && item.rentalPrice != null));
+  const checkoutItems = items.map(item => ({ ...item, price: activeRentalIds.includes(item.id) ? item.rentalPrice! : item.price, subtitle: activeRentalIds.includes(item.id) ? `${item.rentalDays || 7}일 이용권` : '소장' }));
+  const total = items.reduce((sum, item) => sum + (activeRentalIds.includes(item.id) ? item.rentalPrice! : item.price), 0);
   const [method, setMethod] = useState("card");
   const [agreed, setAgreed] = useState(false);
   const [sheet, setSheet] = useState<"coupon" | "cash" | "points" | "method">();
@@ -82,22 +85,26 @@ export function CheckoutPage({
     0,
     Math.min(requestedPoints, wallet?.points || 0, total - discount - cash),
   );
-  const [quote, setQuote] = useState<OrderQuote>();
+  const [quoteResult, setQuote] = useState<OrderQuote>();
+  const [quotedSelection, setQuotedSelection] = useState('');
   const [refundAgreed, setRefundAgreed] = useState(false);
   const selectionKey = items.map((item) => item.id).join(",");
+  const rentalKey = activeRentalIds.join(',');
+  const currentSelection = `${user?.id}:${selectionKey}:${rentalKey}`;
+  const quote = quotedSelection === currentSelection ? quoteResult : undefined;
   useEffect(() => {
     const controller = new AbortController();
     setQuote(undefined);
     setRefundAgreed(false);
     setPaymentError("");
     if (selectionKey)
-      quoteOrder(selectionKey.split(",").map(Number), controller.signal)
-        .then(setQuote)
+      quoteOrder(selectionKey.split(",").map(Number), controller.signal, rentalKey ? rentalKey.split(',').map(Number) : [])
+        .then(value => { if (!controller.signal.aborted) { setQuote(value); setQuotedSelection(currentSelection); } })
         .catch((cause: Error) => {
           if (!controller.signal.aborted) setPaymentError(cause.message);
         });
     return () => controller.abort();
-  }, [selectionKey, user?.id]);
+  }, [selectionKey, rentalKey, user?.id]);
   const payable = quote?.payable_amount ?? total;
   const available =
     sheet === "cash"
@@ -127,6 +134,7 @@ export function CheckoutPage({
       const order = await createOrder(
         items.map((item) => item.id),
         refundAgreed,
+        activeRentalIds,
       );
       if (order.status === "paid") {
         navigate("/checkout/result", {
@@ -134,7 +142,7 @@ export function CheckoutPage({
           state: {
             paymentResult: {
               status: "success",
-              items,
+              items: checkoutItems,
               total: order.amount,
               orderId: String(order.order_id),
             },
@@ -146,7 +154,7 @@ export function CheckoutPage({
         throw new Error("결제 주문 정보를 확인해 주세요.");
       sessionStorage.setItem(
         "yippee.pending-payment",
-        JSON.stringify({ ...order, items, userId: user?.id }),
+        JSON.stringify({ ...order, items: checkoutItems, userId: user?.id }),
       );
       const customerStorage = "yippee.toss.customer." + user?.id;
       const customerKey =
@@ -201,7 +209,10 @@ export function CheckoutPage({
       <div className="screen-content">
         <h2>주문 활동지 {items.length}개</h2>
         {items.map((item) => (
-          <OrderActivityRow key={item.id} item={item} />
+          <section key={item.id}>
+            <OrderActivityRow item={{ ...item, price: activeRentalIds.includes(item.id) ? item.rentalPrice! : item.price, subtitle: activeRentalIds.includes(item.id) ? `${item.rentalDays || 7}일 이용권` : '소장' }} />
+            {item.rentalPrice != null && <label className="wire-field"><span>{item.title} 이용 방식</span><select disabled={busy} value={activeRentalIds.includes(item.id) ? 'rental' : 'permanent'} onChange={event => setRentalIds(previous => event.target.value === 'rental' ? [...new Set([...previous, item.id])] : previous.filter(id => id !== item.id))}><option value="permanent">소장 · {money(item.price)}</option><option value="rental">{item.rentalDays || 7}일 이용권 · {money(item.rentalPrice)}</option></select><small>기간제 상품은 이용 기간 안에 내려받을 수 있어요.</small></label>}
+          </section>
         ))}
         {wallet && (
           <>
@@ -245,15 +256,10 @@ export function CheckoutPage({
           <>
             <div className="section-heading">
               <h2>결제 수단</h2>
-              <Link className="text-button" to="/cards/new">
-                새 카드 등록
-              </Link>
+              <small>토스 결제창에서 선택해 주세요.</small>
             </div>
             <div className="chips">
-              {[
-                ["card", "등록 카드"],
-                ["simple", "간편결제"],
-              ].map(([value, label]) => (
+              {[["card", "카드 결제"]].map(([value, label]) => (
                 <button
                   key={value}
                   className={`chip ${method === value ? "is-selected" : ""}`}

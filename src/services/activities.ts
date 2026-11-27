@@ -152,3 +152,7 @@ export async function getDownload(id: number, signal?: AbortSignal) {
     throw cause;
   }
 }
+export async function getActivityPreviews(id: number, signal?: AbortSignal) {
+  const result = await apiRequest<{ preview_urls: string[] }>(`/activities/${id}/preview`, { signal });
+  return result.preview_urls.map(resolveApiFileUrl);
+}

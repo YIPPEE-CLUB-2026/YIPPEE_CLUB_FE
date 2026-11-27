@@ -33,10 +33,9 @@ export function TrendingKeywords({
 
   return (
     <section className={`section ${compact ? "section--compact" : ""}`}>
-      <h2>실시간 인기 검색어</h2>
+      <h2>실시간 검색어</h2>
       <div className="trending-box">
         <div className="section-heading">
-          <small>인기 검색어 예시 · 실시간 집계 연동 예정</small>
           {collapsible && (
             <button
               className="text-button"
@@ -110,8 +109,8 @@ export function HomePage({ activities, savedIds, onToggle }: CatalogProps) {
     >
       <header className="home-header">
         <Link
-          className="avatar-placeholder"
           to="/badges"
+          className="avatar-placeholder"
           aria-label="만세도감"
           onClick={(event) => {
             if (!user) {
@@ -287,9 +286,9 @@ export function HomePage({ activities, savedIds, onToggle }: CatalogProps) {
         <section className="section">
           <div className="section-heading">
             <h2>
-              지금 가장
+              지금 만나보는
               <br />
-              인기많은 활동지
+              활동지
             </h2>
             <Link className="text-link" to="/activities/popular">
               전체보기 <Icon name="chevron" size={16} />
@@ -332,7 +331,7 @@ export function HomePage({ activities, savedIds, onToggle }: CatalogProps) {
                 to={`/guides/${index + 1}`}
                 key={title}
               >
-                <span className="guide-row__thumbnail" />
+                <span className="guide-row__thumbnail guide-row__label" aria-hidden="true">가이드</span>
                 <span>{title}</span>
                 <Icon name="chevron" />
               </Link>

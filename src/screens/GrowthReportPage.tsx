@@ -80,8 +80,8 @@ export function GrowthReportPage({ report }: { report?: GrowthReport }) {
         <>
           <div className="screen-content screen-content--center">
             <div className="empty-circle" />
-            <h2>아직 리포트를 만들 수 없어요</h2>
-            <p>활동을 더 마치면 발달 영역을 보여드려요.</p>
+            <h2>성장 리포트를 준비 중이에요</h2>
+            <p>활동 기록 집계가 연결되면 이용할 수 있어요. 현재는 활동을 완료해도 리포트가 생성되지 않아요.</p>
           </div>
           <div className="screen-actions">
             <Link className="button button--primary" to="/activities">

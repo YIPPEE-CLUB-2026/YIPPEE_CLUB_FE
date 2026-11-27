@@ -90,6 +90,7 @@ export const statusLabel: Record<string, string> = {
   cancelled: "취소",
   refunded: "환불 완료",
   failed: "결제 실패",
+  payment_failed: "결제 실패",
   review: "확인 필요",
   requested: "검토 대기",
   approved: "승인",

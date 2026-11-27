@@ -12,17 +12,18 @@ export interface CreatedOrder {
   amount: number;
   payment_session_token: string | null;
 }
-export const quoteOrder = (activityIds: number[], signal?: AbortSignal) =>
+export const quoteOrder = (activityIds: number[], signal?: AbortSignal, rentalIds: number[] = []) =>
   apiRequest<OrderQuote>("/orders/quote", {
     method: "POST",
     signal,
-    body: JSON.stringify({ activity_ids: activityIds }),
+    body: JSON.stringify({ activity_ids: activityIds, ...(rentalIds.length ? { rental_activity_ids: rentalIds } : {}) }),
   });
-export const createOrder = (activityIds: number[], refundAgreed: boolean) =>
+export const createOrder = (activityIds: number[], refundAgreed: boolean, rentalIds: number[] = []) =>
   apiRequest<CreatedOrder>("/orders", {
     method: "POST",
     body: JSON.stringify({
       activity_ids: activityIds,
+      ...(rentalIds.length ? { rental_activity_ids: rentalIds } : {}),
       agreed_to_payment: true,
       agreed_to_refund_notice: refundAgreed,
     }),

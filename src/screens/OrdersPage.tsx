@@ -2,30 +2,32 @@ import { listOrders } from "../services/orders";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { ScreenHeader } from "../components/ScreenHeader";
-import { WireDialog } from "../components/WireDialog";
-import { Icon } from "../components/Icon";
 import { Link } from "react-router-dom";
 import type { OrderSummary } from "./OrderDetails";
+import { LoadingState } from "../components/LoadingState";
 
 export function OrdersPage({ orders: supplied }: { orders?: OrderSummary[] }) {
   const { user } = useAuth();
   const [rows, setRows] = useState<OrderSummary[]>([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(!supplied);
   useEffect(() => {
     const controller = new AbortController();
     setRows([]);
+    setError("");
+    setLoading(Boolean(user && !supplied));
     if (user && !supplied)
       listOrders(controller.signal)
-        .then(setRows)
+        .then((rows) => { if (!controller.signal.aborted) setRows(rows); })
         .catch((cause: Error) => {
           if (!controller.signal.aborted) setError(cause.message);
-        });
+        })
+        .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
   }, [user?.id, supplied]);
   const orders = supplied || rows;
-  const [period, setPeriod] = useState("최근 3개월");
+  const period = '전체';
   const [status, setStatus] = useState("전체");
-  const [choosing, setChoosing] = useState(false);
   const filtered = orders.filter(
     (order) =>
       status === "전체" ||
@@ -41,9 +43,7 @@ export function OrdersPage({ orders: supplied }: { orders?: OrderSummary[] }) {
         {error && <p role="alert">{error}</p>}
         <div className="section-heading">
           <span>{period}</span>
-          <button className="chip" onClick={() => setChoosing(true)}>
-            기간 <Icon name="down" size={16} />
-          </button>
+          <span className="wire-note">주문 날짜가 제공되면 기간별 조회를 이용할 수 있어요.</span>
         </div>
         <div className="chips" aria-label="결제 상태">
           {["전체", "결제 완료", "취소"].map((value) => (
@@ -57,7 +57,8 @@ export function OrdersPage({ orders: supplied }: { orders?: OrderSummary[] }) {
             </button>
           ))}
         </div>
-        {filtered.map((order) => (
+        {loading && <LoadingState inline label="결제 내역을 불러오고 있어요" />}
+        {!loading && !error && filtered.map((order) => (
           <article className="order-summary" key={order.id}>
             <p className="order-number-label">주문번호 <strong>{order.id}</strong></p>
             <div className="section-heading">
@@ -70,6 +71,7 @@ export function OrdersPage({ orders: supplied }: { orders?: OrderSummary[] }) {
                     processing: "결제 확인 중",
                     cancelled: "취소",
                     failed: "결제 실패",
+                    payment_failed: "결제 실패",
                     refunded: "환불 완료",
                     review: "결제 확인 필요",
                   } as Record<string, string>
@@ -107,7 +109,7 @@ export function OrdersPage({ orders: supplied }: { orders?: OrderSummary[] }) {
             )}
           </article>
         ))}
-        {!filtered.length && (
+        {!loading && !error && !filtered.length && (
           <div className="wire-orders__empty">
             <div className="empty-circle" />
             <h2>아직 결제 내역이 없어요</h2>
@@ -115,32 +117,6 @@ export function OrdersPage({ orders: supplied }: { orders?: OrderSummary[] }) {
           </div>
         )}
       </div>
-      {choosing && (
-        <WireDialog title="조회 기간" sheet onClose={() => setChoosing(false)}>
-          <h2>조회 기간</h2>
-          <div className="sort-options">
-            {["최근 1개월", "최근 3개월", "최근 6개월", "최근 1년", "전체"].map(
-              (value) => (
-                <label key={value}>
-                  {value}
-                  <input
-                    type="radio"
-                    name="order-period"
-                    checked={period === value}
-                    onChange={() => setPeriod(value)}
-                  />
-                </label>
-              ),
-            )}
-          </div>
-          <button
-            className="button button--primary"
-            onClick={() => setChoosing(false)}
-          >
-            적용하기
-          </button>
-        </WireDialog>
-      )}
     </div>
   );
 }

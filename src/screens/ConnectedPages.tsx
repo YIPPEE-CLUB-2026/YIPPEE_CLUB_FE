@@ -8,6 +8,8 @@ import { Icon } from '../components/Icon';
 import { ActivityCard } from '../components/ActivityCard';
 import { showToast } from '../components/Toast';
 import { getActivity, listCart, listPurchases } from '../services/activities';
+import { ActivitySamples } from '../components/ActivitySamples';
+import { LoadingState } from '../components/LoadingState';
 import type { Activity } from '../types';
 import type { CatalogProps } from './HomePage';
 
@@ -37,6 +39,8 @@ export function CartPage() {
       setLoading(false);
       return;
     }
+    setLoading(true);
+    setError('');
     listCart(controller.signal)
       .then((items) => {
         setItems(items);
@@ -85,9 +89,9 @@ export function CartPage() {
       {!user ? (
         <LoginPrompt />
       ) : loading ? (
-        <div className="screen-content">
-          <p role="status">불러오는 중…</p>
-        </div>
+        <LoadingState inline label="장바구니를 불러오고 있어요" />
+      ) : error && !items.length ? (
+        <div className="screen-content"><p role="alert">{error}</p></div>
       ) : items.length ? (
         <>
           <div className="screen-content">
@@ -369,29 +373,9 @@ export function ActivityDetailPage({
             <p>
               {activity.materials?.join(', ') || '준비물 정보가 아직 없어요.'}
             </p>
-            <div className="section-heading">
-              <h3>활동 미리보기</h3>
-              <Link className="text-link" to={`/viewer/${activity.id}`}>
-                전체보기 <Icon name="chevron" size={16} />
-              </Link>
-            </div>
-            <Link
-              className="detail-previews"
-              to={`/viewer/${activity.id}`}
-              aria-label="활동지 미리보기"
-            >
-              <span />
-              <span />
-            </Link>
+            <ActivitySamples key={activity.id} id={activity.id} />
             <h3>엄마아빠 가이드</h3>
-            <div
-              className="skeleton-paragraph"
-              aria-label="활동별 가이드 준비 중"
-            >
-              <span />
-              <span />
-              <span />
-            </div>
+            <p>활동별 가이드는 준비 중이에요. <Link to="/guides">엄마아빠 가이드북 보기</Link></p>
             <div className="section-heading">
               <h3>리뷰</h3>
               <Link
@@ -401,7 +385,7 @@ export function ActivityDetailPage({
                 전체보기 <Icon name="chevron" size={16} />
               </Link>
             </div>
-            <p className="wire-note">아직 등록된 리뷰가 없어요.</p>
+            <p className="wire-note">리뷰 조회·작성 기능을 준비 중이에요.</p>
             <div className="section-heading">
               <h3>이런 활동지는 어때요</h3>
               <Link className="text-link" to="/activities">

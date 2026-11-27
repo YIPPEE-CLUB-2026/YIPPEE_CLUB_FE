@@ -10,6 +10,7 @@ import type { CatalogProps } from "./HomePage";
 import { useAuth } from "../context/AuthContext";
 import { useChildren } from "../context/ChildrenContext";
 import { LoginPrompt } from "./ConnectedPages";
+import { LoadingState } from "../components/LoadingState";
 
 export function SavedPage({ activities, savedIds, onToggle }: CatalogProps) {
   const { user } = useAuth();
@@ -21,15 +22,19 @@ export function SavedPage({ activities, savedIds, onToggle }: CatalogProps) {
   const [busy, setBusy] = useState(false);
   const saved = activities.filter((activity) => savedIds.includes(activity.id));
   const [purchases, setPurchases] = useState<Activity[]>([]);
+  const [purchasesLoading, setPurchasesLoading] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
     setPurchases([]);
+    setError("");
+    setPurchasesLoading(Boolean(user && tab === "purchases"));
     if (user && tab === "purchases")
       listPurchases(controller.signal)
-        .then(setPurchases)
+        .then((rows) => { if (!controller.signal.aborted) setPurchases(rows); })
         .catch((cause: Error) => {
           if (!controller.signal.aborted) setError(cause.message);
-        });
+        })
+        .finally(() => { if (!controller.signal.aborted) setPurchasesLoading(false); });
     return () => controller.abort();
   }, [user?.id, tab]);
   const items = tab === "favorites" ? saved : purchases;
@@ -70,6 +75,8 @@ export function SavedPage({ activities, savedIds, onToggle }: CatalogProps) {
             aria-pressed={tab === value}
             onClick={() => {
               setTab(value);
+              setError("");
+              if (value === "purchases") setPurchasesLoading(true);
               setEditing(false);
             }}
           >
@@ -82,7 +89,9 @@ export function SavedPage({ activities, savedIds, onToggle }: CatalogProps) {
           {error}
         </p>
       )}
-      {items.length ? (
+      {tab === "purchases" && purchasesLoading ? (
+        <LoadingState inline label="구매한 활동지를 불러오고 있어요" />
+      ) : error ? null : items.length ? (
         <div className="activity-grid">
           {items.map((activity) => (
             <div className="saved-card-wrap" key={activity.id}>
@@ -244,15 +253,15 @@ export function ProfilePage() {
         <div className="profile-balances">
           <Link to="/cash">
             <span>만세 캐시</span>
-            <strong>0원</strong>
+            <strong>준비 중</strong>
           </Link>
           <Link to="/coupons">
             <span>쿠폰함</span>
-            <strong>0장</strong>
+            <strong>준비 중</strong>
           </Link>
           <Link to="/points">
             <span>만세포인트</span>
-            <strong>0P</strong>
+            <strong>준비 중</strong>
           </Link>
         </div>
       </div>
@@ -264,7 +273,7 @@ export function ProfilePage() {
         <img src="/assets/design/badge-help-b62f1.png" alt="" />
         <span>
           <strong>우리 아이 만세도감</strong>
-          <small>놀이하며 모은 배지를 확인해요</small>
+          <small>배지 종류와 조건 미리보기 · 지급 기능 준비 중</small>
         </span>
         <Icon name="chevron" size={20} />
       </Link>
@@ -289,19 +298,19 @@ export function ProfileEditPage() {
   const { user, saveProfile } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState(user?.name || "");
-  const [salutation, setSalutation] = useState(user?.nickname || "");
-  const supportsNickname = user?.nickname !== undefined;
+  const [nickname, setNickname] = useState(user?.nickname || "");
+  const validNickname = /^[가-힣A-Za-z0-9 ]{2,10}$/.test(nickname.trim());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [photo, setPhoto] = useState(false);
   const [photoNotice, setPhotoNotice] = useState(false);
   async function save(event: FormEvent) {
     event.preventDefault();
-    if (busy || !name.trim()) return;
+    if (busy || !name.trim() || !validNickname) return;
     setBusy(true);
     setError("");
     try {
-      await saveProfile(name, supportsNickname ? salutation : undefined);
+      await saveProfile(name.trim(), nickname.trim());
       navigate("/profile", { replace: true });
     } catch (cause) {
       setError((cause as Error).message);
@@ -337,24 +346,22 @@ export function ProfileEditPage() {
                 onChange={(event) => setName(event.target.value)}
               />
             </label>
-            {supportsNickname && (
-              <>
-                <h2 className="wire-subtitle">호칭</h2>
-                <div className="chips">
-                  {["어머님", "아버님", "보호자"].map((value) => (
-                    <button
-                      key={value}
-                      type="button"
-                      className={`chip ${salutation === value ? "is-selected" : ""}`}
-                      aria-pressed={salutation === value}
-                      onClick={() => setSalutation(value)}
-                    >
-                      {value}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
+            <label className="wire-field">
+              닉네임
+              <input
+                required
+                autoComplete="nickname"
+                disabled={busy}
+                value={nickname}
+                minLength={2}
+                maxLength={10}
+                pattern="[가-힣A-Za-z0-9 ]{2,10}"
+                aria-describedby="profile-nickname-help"
+                placeholder="앱에서 불릴 이름을 입력해 주세요"
+                onChange={(event) => setNickname(event.target.value)}
+              />
+              <small id="profile-nickname-help">2~10자, 한글·영문·숫자와 띄어쓰기</small>
+            </label>
             {error && (
               <p className="form-error" role="alert">
                 {error}
@@ -364,7 +371,7 @@ export function ProfileEditPage() {
           <div className="screen-actions">
             <button
               className="button button--primary"
-              disabled={busy || !name.trim()}
+              disabled={busy || !name.trim() || !validNickname}
             >
               {busy ? "저장 중…" : "저장하기"}
             </button>

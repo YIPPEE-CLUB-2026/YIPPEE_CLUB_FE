@@ -16,7 +16,7 @@ import { showToast } from './Toast';
 const navigation: { path: string; label: string; icon: IconName }[] = [
   { path: '/', label: '홈', icon: 'home' },
   { path: '/activities', label: '찾기', icon: 'explore' },
-  { path: '/children', label: '', icon: 'child' },
+  { path: '/children', label: '아이 변경', icon: 'child' },
   { path: '/saved', label: '저장', icon: 'saved' },
   { path: '/profile', label: 'MY', icon: 'profile' },
 ];
@@ -119,7 +119,7 @@ export function Layout() {
               <button
                 key={path}
                 className="nav-item nav-item--child"
-                aria-label="아이 전환"
+                aria-label="아이 변경"
                 aria-expanded={switching}
                 aria-haspopup="dialog"
                 onClick={() => {
@@ -133,6 +133,7 @@ export function Layout() {
                 <span className="nav-item__icon">
                   <ChildTabIcon />
                 </span>
+                <span>{label}</span>
               </button>
             ) : (
               <NavLink
@@ -155,7 +156,7 @@ export function Layout() {
               >
                 <span className="nav-item__icon">
                   <img
-                    src={`/assets/bottom-nav/${tabIcons[icon]}.svg`}
+                    src={`/assets/bottom-nav/${tabIcons[icon]}.svg?v=2`}
                     alt=""
                   />
                 </span>

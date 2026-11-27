@@ -3,6 +3,7 @@ import { WireDialog } from './WireDialog';
 import { Icon } from './Icon';
 import { DevelopmentIcon, developmentDomains } from './DevelopmentIcon';
 import type { Activity } from '../types';
+import { categoryMatches } from '../lib/categories';
 
 export interface Filters {
   age: string;
@@ -66,7 +67,7 @@ export function filterActivities(
         (category === '전체' ||
           (category === 'AI'
             ? item.isAiGenerated === true
-            : (item.categoryNames || [item.category]).includes(category))) &&
+            : (item.categoryNames || [item.category]).some(name => categoryMatches(name, category)))) &&
         (!filters.age ||
           (item.ageMinMonths !== undefined && item.ageMaxMonths !== undefined
             ? item.ageMinMonths <= Number(filters.age) * 12 + 11 &&

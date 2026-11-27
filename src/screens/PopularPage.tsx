@@ -1,37 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ActivityCard } from '../components/ActivityCard';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { Icon } from '../components/Icon';
 import type { CatalogProps } from './HomePage';
 
-// 원본 리뷰 문구는 화면 확인용이며 실제 구매자의 리뷰로 사용하지 않습니다.
-const reviewLabels = [
-  '★★★★★  아이가 정말 좋아했어요',
-  '★★★★☆  매일 날씨를 관찰해요',
-  '★★★★★  좋아요',
-];
 const frameIds = ['117:853', '192:4817', '192:4921'];
 
 export function PopularPage({ activities, savedIds, onToggle }: CatalogProps) {
   const items = activities.slice(0, 3);
   const [active, setActive] = useState(0);
-  const [reviewsVisible, setReviewsVisible] = useState(true);
   const track = useRef<HTMLDivElement>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(
-    () => () => {
-      if (timer.current) clearTimeout(timer.current);
-    },
-    [],
-  );
   function select(index: number) {
     const next = Math.max(0, Math.min(items.length - 1, index));
     if (next === active) return;
     setActive(next);
-    setReviewsVisible(false);
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => setReviewsVisible(true), 180);
   }
   function move(index: number) {
     const first = track.current?.firstElementChild as HTMLElement | null;
@@ -47,7 +30,7 @@ export function PopularPage({ activities, savedIds, onToggle }: CatalogProps) {
   return (
     <div className="popular-page" data-figma-node={frameIds[active]}>
       <ScreenHeader
-        title="인기 활동지 TOP 3"
+        title="둘러볼 활동지 3선"
         right={
           <Link className="icon-button" to="/cart" aria-label="장바구니">
             <Icon name="cart" />
@@ -56,14 +39,7 @@ export function PopularPage({ activities, savedIds, onToggle }: CatalogProps) {
       />
       {items.length ? (
         <>
-          <div
-            className={`popular-reviews ${reviewsVisible ? 'is-visible' : ''}`}
-            aria-label="리뷰 미리보기"
-          >
-            {reviewLabels.map((label) => (
-              <p key={label}>{label}</p>
-            ))}
-          </div>
+          <p className="wire-note">등록된 활동지 중 최대 3개를 소개해요. 판매·리뷰 순위는 아니에요.</p>
           <div
             className="popular-carousel"
             aria-label="인기 활동지"

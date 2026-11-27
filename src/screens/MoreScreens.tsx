@@ -1,5 +1,7 @@
-import { useState } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { useRef, useState } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { withdrawAccount } from '../services/profile';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { WireDialog } from '../components/WireDialog';
 import { Icon } from '../components/Icon';
@@ -71,8 +73,8 @@ export function VersionPage() {
     <div className="screen" data-figma-node="124:4988">
       <ScreenHeader title="버전 정보" backTo="/settings" />
       <div className="screen-content version-content">
-        <p>현재 버전 0.0.0</p>
-        <p className="wire-note">최신 버전이에요.</p>
+        <p>YIPPEE CLUB 웹 서비스</p>
+        <p className="wire-note">웹사이트를 새로고침하면 배포된 화면을 확인할 수 있어요.</p>
       </div>
       <div className="screen-actions">
         <button className="button button--primary" disabled>
@@ -162,29 +164,26 @@ export function LicensesPage() {
 }
 
 export function WithdrawPage() {
-  const [reason, setReason] = useState('');
-  const [step, setStep] = useState(0);
+  const { clearSession } = useAuth();
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const pending = useRef(false);
   const [agreed, setAgreed] = useState(false);
   const [notice, setNotice] = useState(false);
+  async function withdraw() {
+    if (pending.current || !agreed) return;
+    pending.current = true; setBusy(true); setError('');
+    try { await withdrawAccount(); clearSession(); navigate('/login', { replace: true }); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : '탈퇴하지 못했어요. 다시 시도해 주세요.'); }
+    finally { pending.current = false; setBusy(false); }
+  }
   return (
-    <div className="screen" data-figma-node={step ? '124:4593' : '124:4564'}>
+    <div className="screen" data-figma-node="124:4593">
       <ScreenHeader title="회원탈퇴" backTo="/settings" />
       <div className="screen-content">
-        <h2>
-          {step ? '탈퇴 전에 확인해 주세요' : '탈퇴하는 이유를 알려주세요'}
-        </h2>
-        {step ? (
-          <>
-            <div className="info-panel">
-              <div className="cart-total">
-                <span>구매한 활동지</span>
-                <span>0개</span>
-              </div>
-              <div className="cart-total" style={{ marginTop: 8 }}>
-                <span>만세도감 배지</span>
-                <span>0개</span>
-              </div>
-            </div>
+        <h2>탈퇴 전에 확인해 주세요</h2>
+            <div className="info-panel">탈퇴하면 계정을 다시 사용할 수 없으며 구매한 활동지 이용 권한도 종료됩니다. 법령상 보존이 필요한 거래 기록은 해당 기간 동안 별도 보관됩니다.</div>
             <p className="body-copy">
               탈퇴하면 구매한 활동지와 기록을 더 볼 수 없어요.
             </p>
@@ -196,48 +195,28 @@ export function WithdrawPage() {
               />
               위 내용을 확인했어요.
             </label>
-          </>
-        ) : (
-          <div className="sort-options">
-            {[
-              '이용할 활동지가 부족해요',
-              '아이가 많이 컸어요',
-              '앱 사용이 불편해요',
-              '기타',
-            ].map((value) => (
-              <label key={value}>
-                {value}
-                <input
-                  type="radio"
-                  name="withdraw-reason"
-                  checked={reason === value}
-                  onChange={() => setReason(value)}
-                />
-              </label>
-            ))}
-          </div>
-        )}
       </div>
       <div className="screen-actions">
         <button
           className="button button--primary"
-          disabled={step ? !agreed : !reason}
-          onClick={() => (step ? setNotice(true) : setStep(1))}
+          disabled={busy || !agreed}
+          onClick={() => setNotice(true)}
         >
-          {step ? '탈퇴하기' : '다음'}
+          탈퇴하기
         </button>
       </div>
       {notice && (
-        <WireDialog title="회원탈퇴 안내" onClose={() => setNotice(false)}>
-          <p>
-            회원탈퇴 API는 아직 연결되지 않았어요. 계정이 삭제되지 않았습니다.
-          </p>
+        <WireDialog title="회원탈퇴 최종 확인" onClose={() => { if (!busy) setNotice(false); }}>
+          <p>정말 탈퇴할까요? 계정과 이용 권한을 되돌릴 수 없습니다.</p>
+          {error && <p role="alert">{error}</p>}
           <button
             className="button button--primary"
-            onClick={() => setNotice(false)}
+            disabled={busy}
+            onClick={() => void withdraw()}
           >
-            확인
+            {busy ? '탈퇴 처리 중…' : '확인 후 탈퇴'}
           </button>
+          <button className="button" disabled={busy} onClick={() => setNotice(false)}>취소</button>
         </WireDialog>
       )}
     </div>

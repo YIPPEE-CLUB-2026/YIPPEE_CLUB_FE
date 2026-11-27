@@ -150,7 +150,7 @@ export function ChildrenProvider({
       value={{
         children,
         activeChild,
-        loading,
+        loading: loading || state.owner !== owner,
         error,
         reload,
         save,

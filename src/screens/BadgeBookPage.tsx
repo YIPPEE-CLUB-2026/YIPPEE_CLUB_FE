@@ -131,6 +131,7 @@ export function BadgesPage() {
       />
       {activeChild ? (
         <div className="club-badge-content">
+          <p className="feature-notice" role="note">배지 종류와 획득 조건을 미리 볼 수 있어요. 실제 배지 지급·진행률은 준비 중이며, 현재는 활동해도 배지가 열리지 않아요.</p>
           <section className="club-play-record" aria-label="배지 획득 현황">
             <div className="record-decoration" aria-hidden="true">
               <img src={asset('badge-book-4858e.svg')} alt="" />
