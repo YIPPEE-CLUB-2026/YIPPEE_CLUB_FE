@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { WireDialog } from "../components/WireDialog";
 import { Icon } from "../components/Icon";
+import { PdfPreview } from "../components/PdfPreview";
 import { getActivity, getDownload } from "../services/activities";
 import type { Activity } from "../types";
 
@@ -27,6 +28,7 @@ export function ViewerPage() {
     setFileName('');
     setZoom(100);
     setTab("activity");
+    setExpanded(false);
     let previewUrl: string | undefined;
     getActivity(Number(activityId), controller.signal)
       .then(async (item) => {
@@ -81,15 +83,17 @@ export function ViewerPage() {
             {activity?.materials?.join(" · ") || "등록된 준비물 정보가 없어요."}
           </p>
         </div>
-      ) : pdf ? (
-        <iframe
-          title={`${activity?.title} PDF`}
-          src={`${pdf.split("#")[0]}#page=1&view=FitH&toolbar=0`}
-        />
-      ) : activity?.thumbnail ? (
-        <img src={activity.thumbnail} alt={activity.title} />
       ) : (
-        <span className="sr-only">활동지 미리보기가 없어요</span>
+        <button
+          className="document-viewer__cover"
+          aria-label={`${activity?.title} PDF 미리보기 열기`}
+          disabled={!pdf}
+          onClick={() => setExpanded(true)}
+        >
+          {activity?.thumbnail ? (
+            <img src={activity.thumbnail} alt={activity.title} />
+          ) : <span>활동지 PDF 보기</span>}
+        </button>
       )}
     </div>
   );
@@ -147,6 +151,7 @@ export function ViewerPage() {
               aria-label={tab === "guide" ? "활동 가이드" : "활동지"}
             >
               <div className="document-viewer__scroll">{preview}</div>
+              {pdf && tab === "activity" && <p className="document-viewer__hint">이미지를 누르면 PDF를 볼 수 있어요.</p>}
               <div className="document-viewer__paging">
                 <button className="text-button" disabled>
                   이전
@@ -252,7 +257,9 @@ export function ViewerPage() {
               <Icon name="close" />
             </button>
           </div>
-          <div className="document-viewer__scroll">{preview}</div>
+          <div className="document-viewer__scroll">
+            {tab === "activity" && pdf ? <PdfPreview url={pdf} /> : preview}
+          </div>
         </WireDialog>
       )}
       {printing && (

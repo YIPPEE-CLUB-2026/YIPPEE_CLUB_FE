@@ -306,7 +306,7 @@ export function CheckoutPage({
           </p>
         ) : null}
         {quote && payable > 0 && (
-          <div className="checkout-agreement">
+          <div className="checkout-agreement checkout-agreement--refund">
             <p>{quote.refund_notice}</p>
             <label className="checkbox-label">
               <input
@@ -314,8 +314,9 @@ export function CheckoutPage({
                 checked={refundAgreed}
                 onChange={(event) => setRefundAgreed(event.target.checked)}
               />
-              환불 고지를 확인하고 동의합니다.
+              <span>환불 고지를 확인하고 동의합니다.</span>
             </label>
+            <Link className="text-button" to="/policies/refund">환불 정책 보기</Link>
           </div>
         )}
         <div className="checkout-agreement">
@@ -325,7 +326,7 @@ export function CheckoutPage({
               checked={agreed}
               onChange={(event) => setAgreed(event.target.checked)}
             />
-            주문 내용을 확인했고 결제에 동의합니다.
+            <span>주문 내용을 확인했고 결제에 동의합니다.</span>
           </label>
           <Link className="text-button" to="/policies/terms">
             보기

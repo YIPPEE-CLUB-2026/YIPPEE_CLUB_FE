@@ -1163,6 +1163,19 @@ select:focus-visible {
 .profile-summary h2 {
   font-size: 24px;
 }
+.profile-summary__identity {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-wrap: anywhere;
+}
+.profile-summary__nickname {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
 .profile-summary .button {
   width: 100%;
   min-height: 36px;

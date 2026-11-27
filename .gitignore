@@ -13,3 +13,5 @@ Thumbs.db
 
 .pages-build/
 !.env.pages.example
+
+/public/pdfjs/

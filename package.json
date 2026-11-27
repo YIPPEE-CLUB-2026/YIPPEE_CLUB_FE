@@ -12,10 +12,15 @@
     "admin:build": "npm --prefix apps/admin run build",
     "admin:build:pages": "node scripts/build-admin-pages.cjs",
     "admin:typecheck": "npm --prefix apps/admin run typecheck",
-    "build:pages": "node scripts/build-pages.cjs"
+    "build:pages": "node scripts/build-pages.cjs",
+    "postinstall": "node scripts/prepare-pdf.cjs",
+    "predev": "node scripts/prepare-pdf.cjs",
+    "prebuild": "node scripts/prepare-pdf.cjs",
+    "prebuild:pages": "node scripts/prepare-pdf.cjs"
   },
   "dependencies": {
     "next": "16.4.6",
+    "pdfjs-dist": "^6.5.438",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "react-router-dom": "7.18.5"

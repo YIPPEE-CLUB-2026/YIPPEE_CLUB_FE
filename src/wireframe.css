@@ -96,6 +96,39 @@
   flex-shrink: 0;
   font-size: 12px;
 }
+.checkout-agreement--refund {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+.checkout-agreement--refund > p {
+  margin: 0;
+  padding: 16px;
+  background: #f7f5f1;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.75;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.checkout-agreement .checkbox-label {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+  line-height: 1.6;
+}
+.checkout-agreement .checkbox-label span {
+  min-width: 0;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.checkout-agreement input[type="checkbox"] { margin: 0; }
+.checkout-agreement--refund > .text-button { align-self: flex-end; }
+
 .checkout-sheet h2 {
   margin: 0;
   font-size: 20px;
@@ -957,6 +990,62 @@
 }
 .document-viewer-fullscreen .document-viewer__scroll {
   max-height: calc(100dvh - 100px);
+}
+.document-viewer__cover {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.document-viewer__cover:focus-visible {
+  outline: 3px solid var(--color-muted);
+  outline-offset: -3px;
+}
+.document-viewer__hint {
+  margin: 0;
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+.document-viewer-fullscreen.wire-popup {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+.document-viewer-fullscreen .section-heading {
+  flex-shrink: 0;
+}
+.document-viewer-fullscreen .document-viewer__scroll {
+  flex: 1;
+  min-height: 0;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y pinch-zoom;
+}
+.pdf-preview {
+  width: 100%;
+  min-width: 0;
+}
+.pdf-preview__page {
+  min-height: 250px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.pdf-preview__page canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: white;
+}
+.pdf-preview__page span {
+  display: block;
+  padding: 8px;
+  font-size: 12px;
+  color: var(--color-muted);
 }
 .wire-finder .finder-header .oneclick-modal__close {
   width: 24px;

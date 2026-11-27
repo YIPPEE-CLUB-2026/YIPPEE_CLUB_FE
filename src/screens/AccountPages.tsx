@@ -229,11 +229,12 @@ export function ProfilePage() {
             <img src="/assets/01e9f.svg" alt="" />
           </div>
           <div>
-            <h2>
-              {user
-                ? `${user.name || "회원"} ${user.nickname || "보호자"}`
-                : "로그인해 주세요"}
-            </h2>
+            <div className="profile-summary__identity">
+              <h2>{user ? user.name || "회원" : "로그인해 주세요"}</h2>
+              {user?.nickname && (
+                <p className="profile-summary__nickname">{user.nickname}</p>
+              )}
+            </div>
             <Link className="button" to={user ? "/profile/edit" : "/login"}>
               {user && <Icon name="edit" size={16} />}
               {user ? "프로필 편집하기" : "로그인"}

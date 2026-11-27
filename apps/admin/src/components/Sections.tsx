@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { apiRequest, ApiError } from "../lib/api";
+import ActivityPreviews from './ActivityPreviews';
 import {
   adminRequest,
   post,
@@ -1341,6 +1342,7 @@ function ProductEditor({
     ["duration_max", "최대 시간 (분)", 1, 65535],
   ] as const;
   return (
+    <>
     <form className="product-form" onSubmit={submit}>
       {typeof value === "number" && (
         <Notice>
@@ -1465,7 +1467,7 @@ function ProductEditor({
       <details className="unsupported">
         <summary>확장 예정 항목</summary>
         <p>
-          학습지 코드, 구독, 페이지 수, 정답지·미리보기 별도 업로드, PDF
+          학습지 코드, 구독, 페이지 수, 정답지 별도 업로드, PDF
           스탬프·해시 설정은 현재 API에 없어 저장하지 않습니다.
         </p>
       </details>
@@ -1481,6 +1483,9 @@ function ProductEditor({
           {busy ? "저장 중…" : creating ? "학습지 등록" : "변경 사항 저장"}
         </button>
       </div>
+      {creating && <p className="panel-note">미리보기 이미지는 학습지 등록 후 수정 화면에서 별도로 등록할 수 있습니다.</p>}
     </form>
+    {id !== undefined && <ActivityPreviews key={id} id={id} />}
+    </>
   );
 }

@@ -22,6 +22,42 @@ const json = (body, status = 200) =>
     headers: { "Content-Type": "application/json" },
   });
 
+test('preview APIs preserve image order, multipart auth, and return deleted state', async () => {
+  const cache = new Map();
+  const api = load('apps/admin/src/lib/api.ts', cache);
+  const previews = load('apps/admin/src/lib/previews.ts', cache);
+  api.saveTokens({ access_token: 'admin', refresh_token: 'refresh' });
+  const files = [new File(['second'], 'second.png', {type: 'image/png'}), new File(['first'], 'first.webp', {type: 'image/webp'})];
+  const calls = [];
+  global.fetch = async (url, init) => {
+    calls.push([url, init.method || 'GET']);
+    assert.equal(new Headers(init.headers).get('Authorization'), 'Bearer admin');
+    if (init.method === 'POST') {
+      assert.equal(new Headers(init.headers).get('Content-Type'), null);
+      assert.deepEqual(init.body.getAll('previews').map(file => file.name), ['second.png', 'first.webp']);
+      return json({preview_urls: ['/two.webp', '/one.png']});
+    }
+    return json({preview_urls: init.method === 'DELETE' ? [] : ['/existing.png']});
+  };
+  assert.deepEqual((await previews.getActivityPreviews(7)).preview_urls, ['/existing.png']);
+  assert.equal((await previews.replaceActivityPreviews(7, files)).preview_urls.length, 2);
+  assert.deepEqual((await previews.deleteActivityPreviews(7)).preview_urls, []);
+  assert.deepEqual(calls, [['/api/v1/activities/7/preview', 'GET'], ['/api/v1/admin/activities/7/previews', 'POST'], ['/api/v1/admin/activities/7/previews', 'DELETE']]);
+});
+
+test('invalid preview uploads never reach the server; failed upload is not success', async () => {
+  const previews = load('apps/admin/src/lib/previews.ts');
+  let calls = 0;
+  global.fetch = async () => { calls++; return json({message: '업로드 실패'}, 500); };
+  const valid = new File(['image'], 'page.png', {type: 'image/png'});
+  for (const files of [[], Array(6).fill(valid), [new File(['pdf'], 'x.pdf', {type:'application/pdf'})], [new File([], 'empty.png', {type:'image/png'})], [new File([new Uint8Array(5 * 1024 * 1024 + 1)], 'large.png', {type:'image/png'})]]) {
+    assert.throws(() => previews.replaceActivityPreviews(7, files));
+  }
+  assert.equal(calls, 0);
+  await assert.rejects(previews.replaceActivityPreviews(7, [valid]), error => error.status === 500);
+  assert.equal(calls, 1);
+});
+
 test("sales sends exact unit/date formats and retains refund-only negative net amounts", async () => {
   const reporting = load("apps/admin/src/lib/reporting.ts");
   const urls = [];
