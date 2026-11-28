@@ -1,4 +1,5 @@
 import { SocialCallbackPage } from "./screens/SocialCallbackPage";
+import { listFavoriteIds } from './services/activities';
 import { FeatureNotice, UnavailablePage } from './components/FeatureNotice';
 import { ParentRegistrationPage } from "./screens/ParentRegistrationPage";
 import { useEffect, useState } from "react";
@@ -95,11 +96,15 @@ export function App() {
   const [attempt, setAttempt] = useState(0);
   // 로그인한 사용자의 찜은 서버에 저장하며 사용자 변경 시 다시 조회합니다.
   const [savedIds, setSavedIds] = useState<number[]>([]);
+  const [savedState, setSavedState] = useState<{ owner: number | null; loading: boolean; error: string }>({ owner: null, loading: false, error: '' });
+  const [savedAttempt, setSavedAttempt] = useState(0);
   const location = useLocation();
   const { pathname } = location;
+  const serverCatalogRoute = pathname === '/activities' || pathname === '/search' || pathname === '/search/results';
 
   useEffect(() => {
     const controller = new AbortController();
+    if (serverCatalogRoute) { setLoading(false); return () => controller.abort(); }
     setLoading(true);
     setError("");
 
@@ -120,25 +125,25 @@ export function App() {
       });
 
     return () => controller.abort();
-  }, [attempt, isPreview]);
+  }, [attempt, isPreview, serverCatalogRoute]);
 
   const [saving, setSaving] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
     setSavedIds([]);
+    setSavedState({ owner: user?.id ?? null, loading: !!user, error: '' });
     if (user)
-      apiRequest<Paginated<Activity>>("/favorites?page_size=100", {
-        signal: controller.signal,
-      })
-        .then((page) => {
+      listFavoriteIds(controller.signal)
+        .then((ids) => {
           if (!controller.signal.aborted)
-            setSavedIds(page.results.map((item) => item.id));
+            setSavedIds(ids);
         })
         .catch((cause: Error) => {
-          if (!controller.signal.aborted) setError(cause.message);
-        });
+          if (!controller.signal.aborted) setSavedState({ owner: user?.id ?? null, loading: false, error: cause.message });
+        })
+        .finally(() => { if (!controller.signal.aborted) setSavedState(previous => ({ ...previous, loading: false })); });
     return () => controller.abort();
-  }, [user?.id]);
+  }, [user?.id, savedAttempt]);
 
   async function toggleSaved(id: number) {
     if (!user) {
@@ -167,7 +172,7 @@ export function App() {
     }
   }
 
-  const catalogProps = { activities, savedIds, onToggle: toggleSaved };
+  const catalogProps = { activities, savedIds, onToggle: toggleSaved, savedLoading: !!user && (savedState.owner !== user.id || savedState.loading), savedError: savedState.owner === user?.id ? savedState.error : '', onRetrySaved: () => setSavedAttempt(v => v + 1) };
   const needsCatalog =
     pathname === "/" ||
     pathname.startsWith("/activities") ||
@@ -175,6 +180,8 @@ export function App() {
     pathname === "/saved";
 
   if (!ready) return <LoadingState />;
+  if (user?.profile_completed === false && pathname !== '/signup/parent' && !pathname.startsWith('/policies/') && !pathname.startsWith('/auth/'))
+    return <Navigate to="/signup/parent" replace />;
   if (needsCatalog && loading) return <LoadingState label="활동지를 불러오는 중…" />;
 
   const privatePath =

@@ -1,0 +1,40 @@
+.desktop-brand { display: none; }
+
+@media (min-width: 1024px) {
+  :root { --desktop-app-left: 60vw; --desktop-app-center: calc(var(--desktop-app-left) + 201px); }
+  html, body { height: 100%; overflow: hidden; background: #fff9e9; }
+  .desktop-frame { width: 100%; height: 100dvh; background: #fff9e9; }
+  .desktop-brand {
+    position: fixed; inset: 0 auto 0 0; width: var(--desktop-app-left);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--yippee-brown);
+  }
+  .desktop-brand__block { position: relative; width: 450px; height: 422px; flex-shrink: 0; }
+  .desktop-brand__slogan { position: absolute; top: 0; left: 61px; margin: 0; font-size: 24px; font-weight: 400; line-height: 29px; white-space: nowrap; }
+  .desktop-brand__logo { position: absolute; top: 44px; left: 61px; width: 328px; height: 186px; object-fit: contain; }
+  .desktop-brand__description { position: absolute; top: 350px; left: 0; width: 450px; text-align: center; font-size: 24px; line-height: 36px; }
+  .desktop-brand__description strong { font-weight: 700; }
+  .desktop-brand__description p { margin: 0; font-weight: 300; white-space: nowrap; }
+  .desktop-app-region {
+    position: fixed; top: 0; left: var(--desktop-app-left); width: 402px; height: 100dvh;
+    transform: translateZ(0); background: #fff; box-shadow: 0 0 40px rgb(91 70 54 / 10%);
+  }
+  .desktop-app-scroll { height: 100%; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; overscroll-behavior-y: contain; }
+  .desktop-app-scroll::-webkit-scrollbar { display: none; }
+  .desktop-app-region .app-shell { width: 100%; margin: 0; box-shadow: none; }
+  .desktop-app-region .bottom-nav { border-top: 1px solid rgb(91 70 54 / 8%); }
+  .desktop-app-region dialog {
+    left: var(--desktop-app-center); right: auto; margin-left: 0; margin-right: 0;
+    transform: translateX(-50%);
+  }
+  body:has(dialog[open]) .desktop-app-scroll { overflow: hidden; }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  :root { --desktop-app-left: calc(100vw - 402px - 48px); }
+}
+
+@media (max-width: 480px) {
+  .desktop-app-region .app-shell { max-width: none; width: 100%; box-shadow: none; }
+  .desktop-app-region .bottom-nav { max-width: none; }
+}

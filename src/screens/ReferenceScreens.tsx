@@ -27,10 +27,12 @@ export function OneClickOverlay({
   onClose,
   onFind,
   activities = [],
+  availableCategories,
 }: {
   onClose: () => void;
   onFind: (filters: PlayFilters) => void;
   activities?: Activity[];
+  availableCategories?: string[];
 }) {
   const { activeChild, children } = useChildren();
   const [childId, setChildId] = useState(activeChild?.id);
@@ -45,7 +47,7 @@ export function OneClickOverlay({
   });
   const categories = Array.from(
     new Set(
-      activities.flatMap((item) => item.categoryNames || [item.category]),
+      availableCategories || activities.flatMap((item) => item.categoryNames || [item.category]),
     ),
   );
   function toggle(key: 'materials' | 'categories' | 'domains', value: string) {

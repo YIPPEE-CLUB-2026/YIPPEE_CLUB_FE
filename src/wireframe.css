@@ -401,6 +401,20 @@
   margin: 0 auto;
   align-self: center;
 }
+.wire-sheet .sheet-drag-handle {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  margin: -8px -12px -4px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.wire-sheet .sheet-drag-handle:active {
+  cursor: grabbing;
+}
 .print-settings.wire-sheet h2 {
   font-size: 20px;
   margin: 0;

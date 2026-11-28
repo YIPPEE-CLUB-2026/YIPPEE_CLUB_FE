@@ -5,28 +5,30 @@ import { ScreenHeader } from "../components/ScreenHeader";
 import { Link } from "react-router-dom";
 import type { OrderSummary } from "./OrderDetails";
 import { LoadingState } from "../components/LoadingState";
+import { orderSinceDate, formatServerDateTime } from '../lib/date';
 
 export function OrdersPage({ orders: supplied }: { orders?: OrderSummary[] }) {
   const { user } = useAuth();
   const [rows, setRows] = useState<OrderSummary[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(!supplied);
+  const [months, setMonths] = useState(3);
+  const since = months ? orderSinceDate(months) : undefined;
   useEffect(() => {
     const controller = new AbortController();
     setRows([]);
     setError("");
     setLoading(Boolean(user && !supplied));
     if (user && !supplied)
-      listOrders(controller.signal)
+      listOrders(controller.signal, since)
         .then((rows) => { if (!controller.signal.aborted) setRows(rows); })
         .catch((cause: Error) => {
           if (!controller.signal.aborted) setError(cause.message);
         })
         .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
-  }, [user?.id, supplied]);
+  }, [user?.id, supplied, since]);
   const orders = supplied || rows;
-  const period = '전체';
   const [status, setStatus] = useState("전체");
   const filtered = orders.filter(
     (order) =>
@@ -42,8 +44,10 @@ export function OrdersPage({ orders: supplied }: { orders?: OrderSummary[] }) {
       <div className="screen-content">
         {error && <p role="alert">{error}</p>}
         <div className="section-heading">
-          <span>{period}</span>
-          <span className="wire-note">주문 날짜가 제공되면 기간별 조회를 이용할 수 있어요.</span>
+          <span>{months ? `최근 ${months === 12 ? '1년' : `${months}개월`}` : '전체 기간'}</span>
+          <label><span className="sr-only">조회 기간</span><select aria-label="결제 내역 조회 기간" value={months} onChange={e => { setLoading(true); setMonths(Number(e.target.value)); }}>
+            <option value={1}>최근 1개월</option><option value={3}>최근 3개월</option><option value={6}>최근 6개월</option><option value={12}>최근 1년</option><option value={0}>전체</option>
+          </select></label>
         </div>
         <div className="chips" aria-label="결제 상태">
           {["전체", "결제 완료", "취소"].map((value) => (
@@ -62,7 +66,7 @@ export function OrdersPage({ orders: supplied }: { orders?: OrderSummary[] }) {
           <article className="order-summary" key={order.id}>
             <p className="order-number-label">주문번호 <strong>{order.id}</strong></p>
             <div className="section-heading">
-              <small>{order.date}</small>
+              <small>{order.createdAt ? formatServerDateTime(order.createdAt) : order.date}</small>
               <span className="tag">
                 {(
                   {

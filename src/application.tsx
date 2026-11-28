@@ -6,6 +6,7 @@ import { AuthProvider } from './context/AuthContext';
 import { ChildrenProvider } from './context/ChildrenContext';
 import { NavigationHistory } from './components/NavigationHistory';
 import { ToastHost } from './components/Toast';
+import { DesktopFrame } from './components/DesktopFrame';
 
 export default function Application() {
   return (
@@ -13,8 +14,10 @@ export default function Application() {
       <NavigationHistory />
       <AuthProvider>
         <ChildrenProvider>
-          <App />
-          <ToastHost />
+          <DesktopFrame>
+            <App />
+            <ToastHost />
+          </DesktopFrame>
         </ChildrenProvider>
       </AuthProvider>
     </BrowserRouter>

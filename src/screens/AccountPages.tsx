@@ -11,8 +11,10 @@ import { useAuth } from "../context/AuthContext";
 import { useChildren } from "../context/ChildrenContext";
 import { LoginPrompt } from "./ConnectedPages";
 import { LoadingState } from "../components/LoadingState";
+import { ParentProfileFields } from '../components/ParentProfileFields';
+import { validNickname as isValidNickname, type ParentRelation, type ParentAgeGroup } from '../services/profile';
 
-export function SavedPage({ activities, savedIds, onToggle }: CatalogProps) {
+export function SavedPage({ activities, savedIds, onToggle, savedLoading, savedError, onRetrySaved }: CatalogProps) {
   const { user } = useAuth();
   const [tab, setTab] = useState("favorites");
   const [editing, setEditing] = useState(false);
@@ -89,7 +91,7 @@ export function SavedPage({ activities, savedIds, onToggle }: CatalogProps) {
           {error}
         </p>
       )}
-      {tab === "purchases" && purchasesLoading ? (
+      {tab === 'favorites' && savedLoading ? <LoadingState inline label="저장한 활동지를 불러오고 있어요" /> : tab === 'favorites' && savedError ? <p role="alert">{savedError} <button type="button" onClick={onRetrySaved}>다시 시도</button></p> : tab === "purchases" && purchasesLoading ? (
         <LoadingState inline label="구매한 활동지를 불러오고 있어요" />
       ) : error ? null : items.length ? (
         <div className="activity-grid">
@@ -275,7 +277,6 @@ export function ProfilePage() {
           <strong>우리 아이 만세도감</strong>
           <small>배지 종류와 조건 미리보기 · 지급 기능 준비 중</small>
         </span>
-        <Icon name="chevron" size={20} />
       </Link>
       <div className="profile-menu">
         {[
@@ -299,18 +300,20 @@ export function ProfileEditPage() {
   const navigate = useNavigate();
   const [name, setName] = useState(user?.name || "");
   const [nickname, setNickname] = useState(user?.nickname || "");
-  const validNickname = /^[가-힣A-Za-z0-9 ]{2,10}$/.test(nickname.trim());
+  const validNickname = isValidNickname(nickname);
+  const [relation, setRelation] = useState<ParentRelation | ''>(user?.relation || '');
+  const [ageGroup, setAgeGroup] = useState<ParentAgeGroup | ''>(user?.age_group || '');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [photo, setPhoto] = useState(false);
   const [photoNotice, setPhotoNotice] = useState(false);
   async function save(event: FormEvent) {
     event.preventDefault();
-    if (busy || !name.trim() || !validNickname) return;
+    if (busy || !validNickname || !relation) return;
     setBusy(true);
     setError("");
     try {
-      await saveProfile(name.trim(), nickname.trim());
+      await saveProfile(name.trim(), nickname.trim(), { relation: relation || undefined, age_group: ageGroup || null });
       navigate("/profile", { replace: true });
     } catch (cause) {
       setError((cause as Error).message);
@@ -337,12 +340,11 @@ export function ProfileEditPage() {
               </button>
             </div>
             <label className="wire-field">
-              이름
+              이름 (선택)
               <input
-                required
                 disabled={busy}
                 value={name}
-                maxLength={80}
+                maxLength={100}
                 onChange={(event) => setName(event.target.value)}
               />
             </label>
@@ -362,6 +364,7 @@ export function ProfileEditPage() {
               />
               <small id="profile-nickname-help">2~10자, 한글·영문·숫자와 띄어쓰기</small>
             </label>
+            <ParentProfileFields relation={relation} ageGroup={ageGroup} onRelation={setRelation} onAgeGroup={setAgeGroup} disabled={busy} />
             {error && (
               <p className="form-error" role="alert">
                 {error}
@@ -371,7 +374,7 @@ export function ProfileEditPage() {
           <div className="screen-actions">
             <button
               className="button button--primary"
-              disabled={busy || !name.trim() || !validNickname}
+              disabled={busy || !validNickname || !relation}
             >
               {busy ? "저장 중…" : "저장하기"}
             </button>

@@ -37,12 +37,12 @@ test('preview APIs preserve image order, multipart auth, and return deleted stat
       assert.deepEqual(init.body.getAll('previews').map(file => file.name), ['second.png', 'first.webp']);
       return json({preview_urls: ['/two.webp', '/one.png']});
     }
-    return json({preview_urls: init.method === 'DELETE' ? [] : ['/existing.png']});
+    return init.method === 'DELETE' ? json({preview_urls: []}) : json({admin_preview_urls: ['/existing.png']});
   };
   assert.deepEqual((await previews.getActivityPreviews(7)).preview_urls, ['/existing.png']);
   assert.equal((await previews.replaceActivityPreviews(7, files)).preview_urls.length, 2);
   assert.deepEqual((await previews.deleteActivityPreviews(7)).preview_urls, []);
-  assert.deepEqual(calls, [['/api/v1/activities/7/preview', 'GET'], ['/api/v1/admin/activities/7/previews', 'POST'], ['/api/v1/admin/activities/7/previews', 'DELETE']]);
+  assert.deepEqual(calls, [['/api/v1/admin/activities/7', 'GET'], ['/api/v1/admin/activities/7/previews', 'POST'], ['/api/v1/admin/activities/7/previews', 'DELETE']]);
 });
 
 test('invalid preview uploads never reach the server; failed upload is not success', async () => {
@@ -202,4 +202,20 @@ test("admin mutations use the spec request body, and refund 503 remains an error
     admin.post("/orders/refund-requests/7/approve"),
     (error) => error.status === 503,
   );
+});
+
+test('private admin file requests include bearer authentication and preserve binary content', async () => {
+  const api = load('apps/admin/src/lib/api.ts');
+  api.saveTokens({access_token:'admin', refresh_token:'refresh'});
+  global.fetch = async (url, init) => {
+    assert.equal(url, '/api/v1/admin/activities/7/files/pdf');
+    assert.equal(new Headers(init.headers).get('Authorization'), 'Bearer admin');
+    assert.equal('responseType' in init, false);
+    return new Response('pdf bytes', {headers:{'Content-Type':'application/pdf'}});
+  };
+  const blob = await api.apiRequest('/admin/activities/7/files/pdf', {responseType:'blob'});
+  assert.equal(blob.type, 'application/pdf');
+  assert.equal(await blob.text(), 'pdf bytes');
+  global.fetch = async () => json({message:'권한 없음'}, 403);
+  await assert.rejects(api.apiRequest('/admin/activities/7/files/pdf', {responseType:'blob'}), error => error.status === 403);
 });

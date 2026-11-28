@@ -1,3 +1,4 @@
+import { scrollAppToTop } from '../lib/scroll';
 import { OneClickOverlay } from './ReferenceScreens';
 import { useState } from 'react';
 import {
@@ -10,7 +11,6 @@ import { SearchField } from '../components/SearchField';
 import {
   CatalogFilters,
   defaultFilters,
-  filterActivities,
 } from '../components/CatalogFilters';
 import { ActivityCard } from '../components/ActivityCard';
 import { Icon } from '../components/Icon';
@@ -18,6 +18,8 @@ import { WireDialog } from '../components/WireDialog';
 import { useAuth } from '../context/AuthContext';
 import { trendingKeywords } from '../data/activities';
 import { TrendingKeywords, type CatalogProps } from './HomePage';
+import { useCatalogQuery } from '../components/useCatalogQuery';
+import { LoadingState } from '../components/LoadingState';
 
 export function SearchPage({ activities, savedIds, onToggle }: CatalogProps) {
   const { user } = useAuth();
@@ -65,7 +67,8 @@ export function SearchPage({ activities, savedIds, onToggle }: CatalogProps) {
     setPage(1);
     navigate(`/search/results?q=${encodeURIComponent(keyword)}`);
   }
-  const filtered = filterActivities(activities, filters, query);
+  const resource = useCatalogQuery(filters, query, '전체', page, results);
+  const filtered = resource.results;
   const suggestions = Array.from(
     new Set([
       '자동차',
@@ -105,31 +108,12 @@ export function SearchPage({ activities, savedIds, onToggle }: CatalogProps) {
         onSubmit={search}
         autoFocus={!results}
       />
+      {results && <CatalogFilters countLabel={resource.loading ? '조회 중…' : `검색 결과 ‘${query}’ 활동지 ${resource.count}개`} filters={filters} onChange={value => { setFilters(value); setPage(1); }} search />}
       {results ? (
-        filtered.length ? (
+        resource.loading ? <LoadingState inline label="검색 결과를 불러오고 있어요" /> : resource.error ? <p role="alert">{resource.error} <button type="button" onClick={resource.retry}>다시 시도</button></p> : filtered.length ? (
           <>
-            <CatalogFilters
-              countLabel={`검색 결과 ‘${query}’ 활동지 ${filtered.length}개`}
-              filters={filters}
-              onChange={(value) => {
-                setFilters(value);
-                setPage(1);
-              }}
-              search
-            />
             <div className="activity-grid">
-              {filtered
-                .slice(
-                  (Math.min(
-                    page,
-                    Math.max(1, Math.ceil(filtered.length / 20)),
-                  ) -
-                    1) *
-                    20,
-                  Math.min(page, Math.max(1, Math.ceil(filtered.length / 20))) *
-                    20,
-                )
-                .map((activity) => (
+              {filtered.map((activity) => (
                   <ActivityCard
                     key={activity.id}
                     activity={activity}
@@ -146,25 +130,25 @@ export function SearchPage({ activities, savedIds, onToggle }: CatalogProps) {
                   />
                 ))}
             </div>
-            {filtered.length > 20 && (
+            {resource.count > 20 && (
               <nav className="catalog-pagination" aria-label="검색 결과 페이지">
                 <button
                   disabled={page <= 1}
                   onClick={() => {
                     setPage(page - 1);
-                    window.scrollTo(0, 0);
+                    scrollAppToTop();
                   }}
                 >
                   이전
                 </button>
                 <span>
-                  {page} / {Math.ceil(filtered.length / 20)}
+                  {page} / {Math.ceil(resource.count / 20)}
                 </span>
                 <button
-                  disabled={page >= Math.ceil(filtered.length / 20)}
+                  disabled={page >= Math.ceil(resource.count / 20)}
                   onClick={() => {
                     setPage(page + 1);
-                    window.scrollTo(0, 0);
+                    scrollAppToTop();
                   }}
                 >
                   다음
@@ -234,6 +218,7 @@ export function SearchPage({ activities, savedIds, onToggle }: CatalogProps) {
       )}
       {finder && (
         <OneClickOverlay
+          availableCategories={resource.categories.map(item => item.name)}
           activities={activities}
           onClose={() => setFinder(false)}
           onFind={(playFilters) =>

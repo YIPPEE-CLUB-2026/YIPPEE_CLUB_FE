@@ -5,7 +5,10 @@
 - **2026-11-25에 바뀐 것**: 소셜 로그인(3.10) 추가, 활동지 등록의 `price` 필수(10.1), 결제 승인·주문 생성 횟수 제한(1.5).
   소셜 로그인은 실제 카카오·네이버·구글에 붙여 확인한 것이 아니라 각 공급자 문서대로 만든 것입니다.
 - **그 뒤 2026-11-25에 더 바뀐 것**: 받는 PDF에 회원별 고유코드 인쇄(9.2, 9.3), 다운로드 응답에 `issuance_code` 추가와
-  `file_name` 변경(9.2), 매출 집계(10.5), 발급 코드 조회(10.6). 9.3의 **인쇄 위치·적용 페이지·코드 유지 규칙은 협의 전의 기본값**입니다.
+  `file_name` 변경(9.2), 매출 집계(10.5), 발급 코드 조회(10.6). 9.3의 **적용 페이지·코드 유지 규칙은 협의 전의 기본값**입니다.
+- **2026-11-27에 바뀐 것**: 부모 정보(`relation`, `age_group`, `profile_completed`) 추가와 닉네임 규칙 변경(4.1, 4.2),
+  주문 내역·상세에 `created_at`, `paid_at`, `refunded_at`, `payment_method` 추가(8.5, 8.6), PDF 코드 위치를 왼쪽 아래로 변경(9.3),
+  난이도 `normal` 추가(6.2, 10.1), 관리자의 비공개 포함 활동지 목록·상세·파일(10.1), 주문 내역의 `since` 필터(8.5).
 - JSON 예시의 값(id, 이름, 금액, 시각)은 설명용입니다.
 - 직접 눌러 보려면 개발 서버의 Swagger 화면(`/swagger-ui/index.html`)을 씁니다. 로그인 응답의 `access_token`을 Authorize에 넣으면
   로그인이 필요한 API도 부를 수 있습니다(5분 뒤 만료). 그 화면에는 본문의 필드가 나오지 않으니 이 문서를 함께 봅니다.
@@ -400,8 +403,16 @@ Authorization: Bearer <access_token>
 `GET /users/me`
 
 ```json
-{ "id": 12, "email": "parent@example.com", "phone": null, "name": "홍길동", "nickname": "길동맘", "active_child_id": 3 }
+{
+  "id": 12, "email": "parent@example.com", "phone": null, "name": "홍길동", "nickname": "도영 엄마",
+  "relation": "mother", "age_group": "30s", "profile_completed": true, "active_child_id": 3
+}
 ```
+
+- `relation`(아이와의 관계): `mother` | `father` | `grandparent` | `other`. 아직 입력하지 않았으면 `null`.
+- `age_group`(연령대, 선택): `20s` | `30s` | `40s` | `50s_plus`. 입력하지 않았으면 `null`.
+- `profile_completed`: 닉네임과 관계가 모두 있으면 `true`. 가입 직후에는 `false`이므로, `false`인 회원은 부모 정보 입력
+  화면으로 보냅니다. 로그인·소셜 로그인 응답의 `user`에도 같은 세 값이 들어 있습니다.
 
 ### 4.2 프로필 수정 `v1.5 #17`
 
@@ -410,9 +421,16 @@ Authorization: Bearer <access_token>
 | 필드 | 타입 | 필수 | 설명 |
 |---|---|---|---|
 | `name` | string \| null | X | 100자 이내. `null`이나 `""`이면 비웁니다 |
-| `nickname` | string \| null | X | 50자 이내. `null`이나 `""`이면 비웁니다 |
+| `nickname` | string \| null | X | 2~10자. 한글(완성된 글자)·영문·숫자, 낱말 사이 빈칸 하나 허용(예: `도영 엄마`). `null`이나 `""`이면 비웁니다 |
+| `relation` | string \| null | X | `mother` \| `father` \| `grandparent` \| `other`. `null`이면 비웁니다 |
+| `age_group` | string \| null | X | `20s` \| `30s` \| `40s` \| `50s_plus`. `null`이면 비웁니다 |
 
-응답은 `id`, `email`, `phone`, `name`, `nickname` 다섯 개입니다(`active_child_id`는 없음).
+응답은 조회(4.1)에서 `active_child_id`만 뺀 여덟 개입니다.
+
+**부모 정보 입력 화면**: 계정은 그 앞 단계에서 이미 만들어집니다(이메일 가입은 `POST /auth/signup`, 소셜 가입은
+`POST /auth/social/{provider}`). 화면의 "다음"에서 이 API로 `nickname`, `relation`, 고른 경우 `age_group`을 한 번에 보냅니다.
+화면의 필수 표시(닉네임, 관계)는 프론트가 막고, 서버는 `profile_completed`로 알려 줍니다. 이름 칸에는 `name`을 보여 줍니다.
+소셜 가입은 제공자가 준 이름이 들어 있고, 이메일 가입은 비어 있습니다(본인인증은 서버에 없습니다).
 비운 값은 `null`이 아니라 `""`로 돌아옵니다. 한 번도 넣지 않은 값은 `null`입니다.
 
 ### 4.3 비밀번호 변경 `v1.5 #13`
@@ -514,7 +532,7 @@ Authorization: Bearer <access_token>
 | `rental_price` | 7일 이용권 가격. **`null`이면 7일 이용권을 팔지 않는 활동지** |
 | `rental_days` | 이용권 기간. 항상 7 |
 | `sale_status` | 항상 `"on_sale"` |
-| `difficulty` | `"easy"` 또는 `"hard"` |
+| `difficulty` | `"easy"`(하), `"normal"`(중) 또는 `"hard"`(상) |
 | `duration_min`, `duration_max` | 소요 시간(분) |
 | `image` | 표지 주소. 파일이 바뀌면 `?v=` 값이 바뀝니다. 브라우저가 하루 동안 보관합니다 |
 | `pdf` | PDF 주소. **유료 활동지는 이 주소를 그대로 열면 404입니다.** [9.2](#92-다운로드-링크-발급-v15-40)의 링크를 써야 합니다 |
@@ -537,7 +555,7 @@ Authorization: Bearer <access_token>
 | `category` | 정수 | 카테고리 id |
 | `age_years` | 정수 | 만 나이. 그 나이의 개월 범위와 권장 개월이 겹치는 활동지 |
 | `duration` | `최소-최대` | 분. 예: `10-20` |
-| `difficulty` | `easy` \| `hard` | |
+| `difficulty` | `easy` \| `normal` \| `hard` | |
 | `price_min`, `price_max` | 정수 | 영구 소장 가격 기준 |
 | `sort` | `latest`(기본) \| `oldest` \| `title` \| `price_asc` \| `price_desc` | |
 | `page`, `page_size` | 정수 | 기본 1, 20. `page_size`는 최대 100 |
@@ -724,19 +742,23 @@ PDF는 첨부 파일로 내려오고 브라우저에 보관되지 않습니다. 
 
 ### 8.5 결제 내역 `v1.5 #51`
 
-`GET /orders?page=&page_size=` — 최근 주문부터.
+`GET /orders?since=&page=&page_size=` — 최근 주문부터. `since`(선택, `2026-08-27` 형식)를 주면 **한국 시간으로 그날 0시 이후에
+만든 주문**만 옵니다(기준은 결제일이 아니라 주문일 `created_at`). 1·3·6개월·1년 필터는 화면에서 날짜를 계산해 넣습니다.
 
 ```json
 {
   "count": 2,
   "results": [
-    { "order_id": 31, "status": "paid", "amount": 2600, "payment_session_token": null },
-    { "order_id": 30, "status": "cancelled", "amount": 1900, "payment_session_token": null }
+    { "order_id": 31, "status": "paid", "amount": 2600, "payment_session_token": null,
+      "created_at": "2026-11-24T08:39:58.004Z", "paid_at": "2026-11-24T08:40:13.551Z", "refunded_at": null,
+      "payment_method": "toss" },
+    { "order_id": 30, "status": "cancelled", "amount": 1900, "payment_session_token": null,
+      "created_at": "2026-11-23T02:10:00.000Z", "paid_at": null, "refunded_at": null, "payment_method": null }
   ]
 }
 ```
 
-`payment_session_token`은 `pending`인 주문에만 값이 있습니다.
+`payment_session_token`은 `pending`인 주문에만 값이 있습니다. 날짜와 `payment_method`의 뜻은 8.6과 같습니다.
 
 ### 8.6 주문 상세 `v1.5 #52`
 
@@ -751,9 +773,20 @@ PDF는 첨부 파일로 내려오고 브라우저에 보관되지 않습니다. 
     { "activity_id": 8, "title": "색깔 나라", "price": 1900, "plan": "permanent" }
   ],
   "total_amount": 2600,
+  "created_at": "2026-11-24T08:39:58.004Z",
+  "paid_at": "2026-11-24T08:40:13.551Z",
+  "refunded_at": null,
+  "payment_method": "toss",
   "refund_request": null
 }
 ```
+
+- `created_at`: 주문을 만든 시각. 모든 시각은 UTC(끝이 `Z`)이니 화면에서 한국 시간으로 바꿉니다.
+- `paid_at`: 결제가 승인된 시각. 결제 전·취소·실패 주문은 `null`. 무료(0원) 주문은 만든 순간 완료되므로 `created_at`과 거의 같습니다.
+  환불된 주문도 `paid_at`은 그대로 남습니다.
+- `refunded_at`: 환불이 확정된 시각. 환불되지 않았으면 `null`.
+- `payment_method`: `free`(0원 주문) | `toss`(토스페이먼츠로 결제) | `null`(아직 결제되지 않음). 카드·간편결제 같은 세부 수단은
+  서버가 저장하지 않습니다. 영수증(8.7)에서 볼 수 있습니다.
 
 - `items`의 `title`과 `price`는 **구매한 날의** 값입니다.
 - `refund_request`: 환불을 요청한 적이 없으면 `null`. 있으면 가장 최근 요청:
@@ -852,6 +885,8 @@ PDF는 첨부 파일로 내려오고 브라우저에 보관되지 않습니다. 
 - 무료이고 공개된 활동지는 로그인만 하면 발급됩니다.
 - 링크를 받은 뒤라도 그 사이에 기간이 끝나거나, 환불되거나, 계정이 정지되면 그 링크는 404가 됩니다.
 - 링크로 파일이 나갈 때마다 서버에 기록이 남습니다(계정, 활동지, 발급 코드, 시각, 받아 간 IP와 브라우저 정보).
+  이 횟수는 **서버가 파일을 내보낸 횟수**이지 저장 버튼을 누른 횟수가 아닙니다. 미리보기로 한 번 받고 내려받기로 또 받으면
+  2회입니다. 화면에서는 한 번 받은 파일을 저장에 다시 쓰면 1회로 남습니다. HEAD 요청, 거절된 링크, 만들지 못한 파일은 세지 않습니다.
 - `issuance_code`는 그 PDF의 모든 쪽에 인쇄된 코드입니다. 화면에 보여 줄지는 프론트가 정합니다. `download_url`의 토큰에는
   회원 번호가 들어 있지 않습니다.
 - 응답이 200이면 코드가 찍힌 PDF가 이미 만들어져 있습니다. "만드는 중" 상태나 재조회는 없습니다.
@@ -876,15 +911,15 @@ PDF는 첨부 파일로 내려오고 브라우저에 보관되지 않습니다. 
 | 발급 단위 | **회원 한 명 × 활동지 하나에 코드 하나** |
 | 발급 시점 | 그 회원이 그 활동지의 다운로드 링크를 처음 받을 때 |
 | 다시 받을 때 | 같은 코드. 환불 뒤 다시 사도, 7일 이용권 뒤에 소장으로 사도, 관리자가 PDF를 바꿔도 같은 코드 |
-| 인쇄 위치 | 모든 쪽의 오른쪽 위. 위·오른쪽 가장자리에서 12mm, Courier 10pt, 진한 회색. 눕혀 저장된 쪽은 보이는 방향 기준 |
+| 인쇄 위치 | 모든 쪽의 왼쪽 아래. 아래·왼쪽 가장자리에서 6mm, Courier 10pt, 진한 회색. 눕혀 저장된 쪽은 보이는 방향 기준 |
 | 무료 활동지 | 다운로드 링크로 받으면 똑같이 코드가 찍힘. 링크 없이 여는 공개 주소(6.4)는 코드 없는 원본 |
 
 - 코드에는 회원 번호·이메일·주문 번호가 들어 있지 않고, PDF의 다른 곳(파일 이름, 문서 정보)에도 넣지 않습니다.
 - 코드를 받는 회원용 API는 없습니다. 코드를 안다고 다른 사람의 파일이나 정보를 볼 수 없고, 코드로 찾는 것은 관리자만 합니다(10.6).
 - 서버는 코드를 회원, 활동지, 발급 당시의 주문, 발급 시각과 묶어 저장합니다.
-- **협의가 필요한 것**: 위 표의 발급 단위, 다시 받을 때의 규칙, 인쇄 위치·적용 쪽은 서버가 고른 기본값입니다. 지금 도안에 찍어 보면
-  주제별 도안은 코드가 "이름:" 칸 위에, 이름 놀이북은 쪽 번호 동그라미 옆 테두리에 걸쳐 찍힙니다. 아이가 이름을 쓰면 코드가
-  가려지므로, 도안에서 그 자리를 비우거나 위치를 바꾸기 전에는 사진 인증에 쓸 수 없습니다.
+- **협의가 필요한 것**: 위 표의 발급 단위, 다시 받을 때의 규칙, 인쇄 위치·적용 쪽은 서버가 고른 기본값입니다. 왼쪽 아래는 지금 도안
+  세 가지(주제별 도안, 이름 놀이북, 활동북)에서 비어 있는 구석입니다. 오른쪽 위에는 이름 칸이, 오른쪽 아래에는 YIPPEE CLUB
+  표시가 있어 그 자리에 찍으면 겹칩니다. 새 도안도 왼쪽 아래 6mm 안쪽(가로 약 6cm, 세로 약 1cm)은 비워 두어야 합니다.
   사진 인증(코드 대조, 중복 승인 방지)과 무료 원본 공개 주소의 처리는 아직 만들지 않았습니다.
 - 관리자가 올리는 PDF는 코드를 찍을 수 있어야 합니다. 암호가 걸렸거나 열리지 않는 PDF는 등록·교체 때 400(`pdf`)입니다.
 
@@ -904,6 +939,31 @@ PDF는 첨부 파일로 내려오고 브라우저에 보관되지 않습니다. 
 | `POST /admin/activities/{id}/files` | 폼 업로드: `image`, `pdf` 중 하나 이상 | 활동지 + `is_public` |
 | `POST /admin/activities/{id}/previews` | 폼 업로드: `previews` 이미지 1~5개(각 5MB 이하). 기존 샘플 전체를 이 순서로 교체 | `{ "preview_urls": [...] }` |
 | `DELETE /admin/activities/{id}/previews` | 없음 | 샘플을 모두 지움. `{ "preview_urls": [] }` |
+| `GET /admin/activities?is_public=&category=&q=&page=&page_size=` | 없음 | 비공개 포함 전체 목록, 최근 등록 순. `{ "count", "results": [활동지 + is_public] }` |
+| `GET /admin/activities/{id}` | 없음 | 비공개 포함 상세(아래) |
+| `GET /admin/activities/{id}/files/image`, `.../files/pdf` | 없음 | 표지·원본 PDF 파일. 관리자 토큰 필요 |
+| `GET /admin/activities/{id}/previews/{번호}` | 없음 | 샘플 이미지 파일. 관리자 토큰 필요 |
+
+**관리자 목록**: `is_public`은 `true` \| `false`(생략하면 전체), `category`는 카테고리 id, `q`는 제목·설명 검색(1~255자),
+`page_size`는 최대 100(기본 20). 그 밖의 파라미터는 400입니다. 공개 목록(`GET /activities`)과 달리 정렬은 고정입니다.
+
+**관리자 상세**: 활동지의 모든 필드(6.3과 같음)에 아래가 붙습니다.
+
+```json
+{
+  "is_public": false,
+  "created_at": "2026-11-27T01:10:00.000Z",
+  "updated_at": "2026-11-27T02:30:00.000Z",
+  "admin_image": "https://<서버>/api/v1/admin/activities/7/files/image",
+  "admin_pdf": "https://<서버>/api/v1/admin/activities/7/files/pdf",
+  "admin_preview_urls": ["https://<서버>/api/v1/admin/activities/7/previews/1"]
+}
+```
+
+- 비공개 활동지는 공개 주소(`image`, `pdf`, `/preview`)가 404입니다. 이것은 "파일 없음"이 아니라 "비공개"입니다.
+  관리자 화면에서는 `admin_*` 주소를 **Authorization 헤더를 붙여** 받아 보여 줍니다(`<img src>`로는 열리지 않음).
+- `admin_pdf`는 회원 코드가 찍히지 않은 원본입니다. 샘플이 없으면 `admin_preview_urls`는 빈 배열입니다.
+- 없는 id는 404, 일반 회원은 403, 토큰 없으면 401입니다.
 
 활동지 등록(`multipart/form-data`):
 
@@ -912,7 +972,7 @@ PDF는 첨부 파일로 내려오고 브라우저에 보관되지 않습니다. 
 | `title` | O | 255자 이내 |
 | `description` | O | 4,000자 이내 |
 | `age_min_months`, `age_max_months` | O | 0~1200. 최대가 최소보다 작을 수 없음 |
-| `difficulty` | O | `easy` \| `hard` |
+| `difficulty` | O | `easy` \| `normal` \| `hard` |
 | `duration_min`, `duration_max` | O | 1~65535분 |
 | `price` | O | 0~10,000,000. 무료는 `0`을 적습니다(빠뜨리면 400) |
 | `rental_price` | X | 7일 이용권 가격. **0보다 크고 `price`보다 작아야 함.** 생략하면 이용권 없음 |

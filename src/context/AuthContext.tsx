@@ -18,6 +18,7 @@ import {
   updateProfile,
   mergeProfileUpdate,
   type ProfileRead,
+  type ParentProfileInput,
 } from "../services/profile";
 import {
   readPreviewSession,
@@ -33,7 +34,7 @@ interface AuthState {
   establish: (tokens: Tokens) => Promise<void>;
   logout: () => Promise<void>;
   reload: () => Promise<void>;
-  saveProfile: (name: string, nickname?: string) => Promise<void>;
+  saveProfile: (name: string, nickname?: string, parent?: ParentProfileInput) => Promise<void>;
   clearSession: () => void;
   setActiveChild: (id: number | null, replacing?: number) => void;
 
@@ -89,9 +90,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw cause;
     }
   }
-  async function saveProfile(name: string, nickname?: string) {
+  async function saveProfile(name: string, nickname?: string, parent?: ParentProfileInput) {
     const version = generation.current;
-    const profile = await updateProfile(name, nickname);
+    const profile = await updateProfile(name, nickname, parent);
     if (version !== generation.current)
       throw new Error("로그인 상태가 변경됐어요. 다시 로그인해 주세요.");
     profileRevision.current++;

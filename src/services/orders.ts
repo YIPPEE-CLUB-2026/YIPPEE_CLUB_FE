@@ -1,11 +1,15 @@
-import { apiRequest } from "../lib/api";
+import { apiRequest, resolveApiFileUrl } from "../lib/api";
 import type { OrderSummary } from "../screens/OrderDetails";
-import { getActivity } from "./activities";
+import { formatServerDateTime } from '../lib/date';
 
 interface OrderDetail {
   id: number;
   status: string;
   total_amount: number;
+  created_at?: string;
+  paid_at?: string | null;
+  refunded_at?: string | null;
+  payment_method?: 'free' | 'toss' | null;
   items: { activity_id: number; title: string; price: number; plan: string }[];
   refund_request: {
     status: string;
@@ -16,15 +20,15 @@ interface OrderDetail {
 export async function getOrder(
   id: string,
   signal?: AbortSignal,
+  images = new Map<number, Promise<string | undefined>>(),
 ): Promise<OrderSummary> {
   if (!/^[1-9]\d*$/.test(id)) throw new Error("주문 번호를 확인해 주세요.");
   const order = await apiRequest<OrderDetail>(`/orders/${id}`, { signal });
   // 주문의 제목·가격은 구매 당시 값을 유지하고 현재 표지 이미지만 보완합니다.
-  const images = new Map<number, Promise<string | undefined>>();
   const items = await Promise.all(order.items.map(async (item) => {
     if (!images.has(item.activity_id)) {
-      images.set(item.activity_id, getActivity(item.activity_id, signal)
-        .then(activity => activity.thumbnail)
+      images.set(item.activity_id, apiRequest<{ image: string }>(`/activities/${item.activity_id}`, { signal })
+        .then(activity => activity.image ? resolveApiFileUrl(activity.image) : undefined)
         .catch(cause => { if (signal?.aborted) throw cause; return undefined; }));
     }
     return {
@@ -36,8 +40,11 @@ export async function getOrder(
   }));
   return {
     id: String(order.id),
-    date: "서버에서 제공하지 않음",
-    method: order.total_amount === 0 ? "무료 주문" : "토스페이먼츠",
+    date: order.paid_at ? formatServerDateTime(order.paid_at) : '결제 전',
+    createdAt: order.created_at,
+    paidAt: order.paid_at,
+    refundedAt: order.refunded_at,
+    method: order.payment_method === 'free' ? '무료 주문' : order.payment_method === 'toss' ? '토스페이먼츠' : '결제 전',
     total: order.total_amount,
     cancelled: ["cancelled", "refunded"].includes(order.status),
     cancellable:
@@ -50,18 +57,18 @@ export async function getOrder(
 }
 export async function listOrders(
   signal?: AbortSignal,
+  since?: string,
 ): Promise<OrderSummary[]> {
   const orders: OrderSummary[] = [];
+  const images = new Map<number, Promise<string | undefined>>();
   for (let page = 1; ; page++) {
     const result = await apiRequest<{
       count: number;
       results: { order_id: number }[];
-    }>(`/orders?page=${page}&page_size=100`, { signal });
-    orders.push(
-      ...(await Promise.all(
-        result.results.map((item) => getOrder(String(item.order_id), signal)),
-      )),
-    );
+    }>(`/orders?page=${page}&page_size=100${since ? `&since=${encodeURIComponent(since)}` : ''}`, { signal });
+    for (let start = 0; start < result.results.length; start += 5) {
+      orders.push(...await Promise.all(result.results.slice(start, start + 5).map(item => getOrder(String(item.order_id), signal, images))));
+    }
     if (!result.results.length || orders.length >= result.count) return orders;
   }
 }

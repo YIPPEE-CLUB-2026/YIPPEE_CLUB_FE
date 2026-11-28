@@ -1,6 +1,28 @@
 import { apiRequest, ApiError, resolveApiFileUrl } from "../lib/api";
 
 import type { Activity, Paginated } from "../types";
+import { categoryMatches } from '../lib/categories';
+import type { Filters } from '../components/CatalogFilters';
+
+export async function queryActivities(filters: Filters, query: string, category: string, page: number, signal?: AbortSignal) {
+  const categories = await listCategories(signal);
+  const match = categories.find(item => item.name === category) || categories.find(item => categoryMatches(item.name, category));
+  if ((category !== '전체' && !match) || filters.domain) return { count: 0, results: [] as Activity[], categories };
+  const params = new URLSearchParams({ page: String(page), page_size: '20', sort: filters.sort });
+  if (query.trim()) params.set('q', query.trim());
+  if (match) params.set('category', String(match.id));
+  if (filters.age) params.set('age_years', filters.age);
+  if (filters.duration) params.set('duration', filters.duration === '20-plus' ? '20-65535' : filters.duration);
+  if (filters.difficulty) params.set('difficulty', filters.difficulty);
+  if (filters.price) params.set('price_max', filters.price);
+  try {
+    const result = await apiRequest<Paginated<ActivityResponse>>(`/activities?${params}`, { signal });
+    return { count: result.count, results: result.results.map(item => toActivity(item, categories)), categories };
+  } catch (cause) {
+    if (cause instanceof ApiError && cause.status === 404 && page > 1) return { count: 0, results: [] as Activity[], categories };
+    throw cause;
+  }
+}
 
 export interface Category {
   id: number;
@@ -78,6 +100,14 @@ export async function listCategories(
       signal,
     })
   ).results;
+}
+export async function listFavoriteIds(signal?: AbortSignal): Promise<number[]> {
+  const ids: number[] = [];
+  for (let page = 1; ; page++) {
+    const result = await apiRequest<{ count: number; results: { id: number }[] }>(`/favorites?page=${page}&page_size=100`, { signal });
+    ids.push(...result.results.map(item => item.id));
+    if (!result.results.length || ids.length >= result.count) return Array.from(new Set(ids));
+  }
 }
 export async function listActivities(signal: AbortSignal): Promise<Activity[]> {
   const categories = await listCategories(signal);

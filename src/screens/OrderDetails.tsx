@@ -7,10 +7,14 @@ import { Icon } from "../components/Icon";
 import type { Activity } from "../types";
 import { ActivityThumbnail } from "../components/ActivityThumbnail";
 import { LoadingState } from "../components/LoadingState";
+import { formatServerDateTime } from '../lib/date';
 
 export interface OrderSummary {
   id: string;
   date: string;
+  createdAt?: string;
+  paidAt?: string | null;
+  refundedAt?: string | null;
   method: string;
   total: number;
   items: Activity[];
@@ -120,6 +124,8 @@ export function OrderDetailPage({ order: supplied }: { order?: OrderSummary }) {
             <span>결제일</span>
             <span>{order.date}</span>
           </div>
+          {order.createdAt && <div><span>주문일</span><span>{formatServerDateTime(order.createdAt)}</span></div>}
+          {order.refundedAt && <div><span>환불일</span><span>{formatServerDateTime(order.refundedAt)}</span></div>}
           <div>
             <span>결제 수단</span>
             <span>{order.method}</span>

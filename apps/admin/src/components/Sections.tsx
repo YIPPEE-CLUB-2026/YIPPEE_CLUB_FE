@@ -10,6 +10,7 @@ import {
 } from "react";
 import { apiRequest, ApiError } from "../lib/api";
 import ActivityPreviews from './ActivityPreviews';
+import { AdminMedia } from './AdminMedia';
 import {
   adminRequest,
   post,
@@ -1073,17 +1074,15 @@ export function Categories() {
 export function Products() {
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
+  const [visibility, setVisibility] = useState('');
+  const [category, setCategory] = useState('');
+  const categories = useResource<Page<Category>>('/activity-categories');
   const [editor, setEditor] = useState<Product | "new" | number>();
   const resource = useResource<Page<Product>>(
-    `/activities?page=${page}&page_size=20${query ? `&q=${encodeURIComponent(query)}` : ""}`,
+    `/admin/activities?page=${page}&page_size=20${query ? `&q=${encodeURIComponent(query)}` : ""}${visibility ? `&is_public=${visibility}` : ''}${category ? `&category=${category}` : ''}`,
   );
   return (
     <>
-      <Notice>
-        목록에는 공개된 학습지만 표시됩니다. 비공개 학습지는 ID를 지정해 일부
-        필드 또는 파일을 수정할 수 있습니다. 관리자 전용 전체 목록 API는 아직
-        없습니다.
-      </Notice>
       <Panel
         title="학습지 목록"
         description="원본 PDF와 표지, 판매 가격, 권장 연령을 관리합니다."
@@ -1094,6 +1093,8 @@ export function Products() {
         }
       >
         <div className="product-searches">
+          <label>공개 상태 <select value={visibility} onChange={e => { setVisibility(e.target.value); setPage(1); }}><option value="">전체</option><option value="true">공개</option><option value="false">비공개</option></select></label>
+          <label>카테고리 <select value={category} onChange={e => { setCategory(e.target.value); setPage(1); }}><option value="">전체</option>{categories.data?.results.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
           <form
             className="search-form"
             onSubmit={(e) => {
@@ -1141,6 +1142,7 @@ export function Products() {
                     <th>소장 가격</th>
                     <th>7일 이용권</th>
                     <th>난이도</th>
+                    <th>공개 상태</th>
                     <th>관리</th>
                   </tr>
                 </thead>
@@ -1149,7 +1151,7 @@ export function Products() {
                     <tr key={row.id}>
                       <td>
                         <div className="product-cell">
-                          {row.image && <img src={row.image} alt="" />}
+                          <AdminMedia path={`/admin/activities/${row.id}/files/image`} />
                           <div>
                             <strong>{row.title}</strong>
                             <small className="block">ID {row.id}</small>
@@ -1166,10 +1168,11 @@ export function Products() {
                           : money(row.rental_price)}
                       </td>
                       <td>{{ easy: "하", normal: "중", hard: "상" }[row.difficulty]}</td>
+                      <td>{row.is_public ? '공개' : '비공개'}</td>
                       <td>
                         <button
                           className="text-link"
-                          onClick={() => setEditor(row)}
+                          onClick={() => setEditor(row.id)}
                         >
                           수정 ↗
                         </button>
@@ -1181,8 +1184,8 @@ export function Products() {
             </div>
           ) : (
             <Empty
-              title="등록된 공개 학습지가 없습니다"
-              description="새 학습지를 등록하고 공개로 설정하면 고객용 앱에도 표시됩니다."
+              title="조건에 맞는 학습지가 없습니다"
+              description="검색 조건을 변경하거나 새 학습지를 등록해 주세요."
             />
           ))}
         <Pagination
@@ -1205,7 +1208,7 @@ export function Products() {
           wide
           onClose={() => setEditor(undefined)}
         >
-          <ProductEditor
+          <ProductEditorLoader
             value={editor}
             onSave={() => {
               setEditor(undefined);
@@ -1216,6 +1219,17 @@ export function Products() {
       )}
     </>
   );
+}
+function ProductEditorLoader({ value, onSave }: { value: Product | 'new' | number; onSave: () => void }) {
+  return value === 'new' ? <ProductEditor value="new" onSave={onSave} /> : <ExistingProductEditor id={typeof value === 'number' ? value : value.id} onSave={onSave} />;
+}
+function ExistingProductEditor({ id, onSave }: { id: number; onSave: () => void }) {
+  const resource = useResource<Product>(`/admin/activities/${id}`);
+  return <><State {...resource} />{resource.error && <button onClick={resource.reload}>다시 조회</button>}{resource.data && <>
+    <div className="admin-product-files"><AdminMedia path={`/admin/activities/${id}/files/image`} alt="현재 표지" /><AdminMedia path={`/admin/activities/${id}/files/pdf`} pdf /></div>
+    <p className="panel-note">등록: {date(resource.data.created_at)} · 수정: {date(resource.data.updated_at)}</p>
+    <ProductEditor key={id} value={resource.data} onSave={onSave} />
+  </>}</>;
 }
 function ProductEditor({
   value,
@@ -1403,7 +1417,7 @@ function ProductEditor({
         </label>
         <label>
           공개 상태
-          <select name="is_public" defaultValue={creating ? "false" : ""}>
+          <select name="is_public" defaultValue={product ? String(product.is_public ?? false) : creating ? "false" : ""}>
             {!creating && <option value="">변경하지 않음</option>}
             <option value="false">비공개</option>
             <option value="true">공개</option>

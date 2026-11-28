@@ -1,3 +1,4 @@
+import { scrollAppToTop } from '../lib/scroll';
 import { useEffect, useState } from 'react';
 import {
   Link,
@@ -100,7 +101,7 @@ export function Layout() {
     '/guides',
   ].includes(pathname);
   useEffect(() => {
-    window.scrollTo(0, 0);
+    scrollAppToTop();
     if (!(document.activeElement instanceof HTMLInputElement))
       document.querySelector<HTMLElement>('#main-content')?.focus();
   }, [pathname]);
@@ -170,6 +171,8 @@ export function Layout() {
         <WireDialog
           title="아이 전환"
           sheet
+          draggable
+          dismissDisabled={busy}
           className="child-switch-sheet"
           onClose={() => {
             if (!busy) setSwitching(false);

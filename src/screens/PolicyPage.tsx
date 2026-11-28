@@ -1,3 +1,4 @@
+import { scrollAppToTop } from '../lib/scroll';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ScreenHeader } from '../components/ScreenHeader';
@@ -7,7 +8,7 @@ import { policies, policyLinks } from '../data/policies';
 export function PolicyPage({ type }: { type: string }) {
   const policy = policies[type];
   const title = policyLinks.find((link) => link.key === type)?.title;
-  useEffect(() => { window.scrollTo(0, 0); }, [type]);
+  useEffect(() => { scrollAppToTop(); }, [type]);
   if (!policy || !title) return <div className="screen policy-screen"><ScreenHeader title="서비스 정책" /><div className="policy-document"><p>요청하신 정책을 찾을 수 없습니다.</p><Link to="/">홈으로 이동</Link></div></div>;
   return (
     <div className="screen policy-screen" data-figma-node="413:9008">

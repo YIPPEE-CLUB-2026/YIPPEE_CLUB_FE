@@ -9,6 +9,7 @@ import '../auth-spec.css';
 import '../wireframe.css';
 import '../bottom-nav.css';
 import '../activity-design.css';
+import '../desktop-frame.css';
 
 export const metadata: Metadata = {
   title: 'YIPPEE CLUB',

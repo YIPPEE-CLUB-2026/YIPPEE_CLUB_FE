@@ -1,4 +1,3 @@
-import { apiRequest } from './api';
 import { adminRequest } from './admin';
 export interface ActivityPreviews { preview_urls: string[] }
 export function validatePreviewFiles(files: File[]) {
@@ -8,7 +7,10 @@ export function validatePreviewFiles(files: File[]) {
     if (!file.size || file.size > 5 * 1024 * 1024) throw new Error('각 이미지는 비어 있지 않은 5MB 이하 파일이어야 합니다.');
   }
 }
-export const getActivityPreviews = (id: number, signal?: AbortSignal) => apiRequest<ActivityPreviews>(`/activities/${id}/preview`, { signal });
+export async function getActivityPreviews(id: number, signal?: AbortSignal): Promise<ActivityPreviews> {
+  const result = await adminRequest<{ admin_preview_urls: string[] }>(`/activities/${id}`, { signal });
+  return { preview_urls: result.admin_preview_urls };
+}
 export function replaceActivityPreviews(id: number, files: File[]) {
   validatePreviewFiles(files);
   const body = new FormData();

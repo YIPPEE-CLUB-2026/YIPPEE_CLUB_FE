@@ -1,15 +1,17 @@
+import { scrollAppToTop } from '../lib/scroll';
 import { useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ActivityCard } from './ActivityCard';
 import {
   CatalogFilters,
   defaultFilters,
-  filterActivities,
 } from './CatalogFilters';
 import { Icon } from './Icon';
 import { PlayCategoryIcon } from './PlayCategoryIcon';
 import { TrendingKeywords, type CatalogProps } from '../screens/HomePage';
 import { OneClickOverlay } from '../screens/ReferenceScreens';
+import { useCatalogQuery } from './useCatalogQuery';
+import { LoadingState } from './LoadingState';
 
 export const CATALOG_PAGE_SIZE = 20;
 export function ActivityCatalog({
@@ -25,16 +27,13 @@ export function ActivityCatalog({
   const [filters, setFilters] = useState(defaultFilters);
   const [page, setPage] = useState(1);
   const [finder, setFinder] = useState(false);
-  const filtered = filterActivities(activities, filters, query, category);
+  const resource = useCatalogQuery(filters, query, category, page);
   const totalPages = Math.max(
     1,
-    Math.ceil(filtered.length / CATALOG_PAGE_SIZE),
+    Math.ceil(resource.count / CATALOG_PAGE_SIZE),
   );
-  const currentPage = Math.min(page, totalPages);
-  const items = filtered.slice(
-    (currentPage - 1) * CATALOG_PAGE_SIZE,
-    currentPage * CATALOG_PAGE_SIZE,
-  );
+  const currentPage = page;
+  const items = resource.results;
   function update(key: string, value: string) {
     const next = new URLSearchParams(params);
     if (value) next.set(key, value);
@@ -54,7 +53,7 @@ export function ActivityCatalog({
       '음악',
       '체육',
       'AI, 코딩',
-      ...activities.flatMap((item) => item.categoryNames || [item.category]),
+      ...resource.categories.map(item => item.name),
     ]),
   );
   return (
@@ -83,6 +82,7 @@ export function ActivityCatalog({
       </header>
       <label className="search-field">
         <input
+          maxLength={255}
           aria-label="활동안 검색"
           placeholder="놀이 키워드를 입력해보세요.(자동차, 공룡)"
           value={query}
@@ -162,7 +162,7 @@ export function ActivityCatalog({
         domainAvailable={activities.some(
           (item) => item.developmentDomains?.length,
         )}
-        countLabel={`활동안 ${filtered.length}개`}
+        countLabel={resource.loading ? '조회 중…' : `활동안 ${resource.count}개`}
         filters={filters}
         onChange={(value) => {
           setFilters(value);
@@ -186,18 +186,20 @@ export function ActivityCatalog({
           />
         ))}
       </div>
-      {!items.length && (
+      {resource.loading && <LoadingState inline label="활동지를 찾고 있어요" />}
+      {!resource.loading && resource.error && <p role="alert">{resource.error} <button type="button" onClick={resource.retry}>다시 시도</button></p>}
+      {!resource.loading && !resource.error && !items.length && (
         <p className="wire-empty">
           조건에 맞는 활동안이 없어요. 검색어나 필터를 바꿔 주세요.
         </p>
       )}
-      {totalPages > 1 && (
+      {!resource.loading && !resource.error && totalPages > 1 && (
         <nav className="catalog-pagination" aria-label="활동안 페이지">
           <button
             disabled={currentPage === 1}
             onClick={() => {
               setPage(currentPage - 1);
-              window.scrollTo(0, 0);
+              scrollAppToTop();
             }}
           >
             이전
@@ -209,7 +211,7 @@ export function ActivityCatalog({
             disabled={currentPage === totalPages}
             onClick={() => {
               setPage(currentPage + 1);
-              window.scrollTo(0, 0);
+              scrollAppToTop();
             }}
           >
             다음
@@ -220,7 +222,7 @@ export function ActivityCatalog({
         collapsible={false}
         onSearch={(value) => {
           update('q', value);
-          window.scrollTo(0, 0);
+          scrollAppToTop();
         }}
       />
       <button
@@ -232,6 +234,7 @@ export function ActivityCatalog({
       </button>
       {finder && (
         <OneClickOverlay
+          availableCategories={resource.categories.map(item => item.name)}
           activities={activities}
           onClose={() => setFinder(false)}
           onFind={(playFilters) => {

@@ -1,11 +1,19 @@
 import { apiRequest } from "../lib/api";
 
+export type ParentRelation = 'mother' | 'father' | 'grandparent' | 'other';
+export type ParentAgeGroup = '20s' | '30s' | '40s' | '50s_plus';
+export interface ParentProfileInput { relation?: ParentRelation | null; age_group?: ParentAgeGroup | null; }
+export const validNickname = (value: string) => /^[가-힣A-Za-z0-9]+(?: [가-힣A-Za-z0-9]+)*$/.test(value.trim()) && value.trim().length >= 2 && value.trim().length <= 10;
+
 export interface Profile {
   id: number;
   email: string;
   name: string | null;
   phone: string | null;
   nickname: string | null;
+  relation?: ParentRelation | null;
+  age_group?: ParentAgeGroup | null;
+  profile_completed?: boolean;
 }
 
 export interface ProfileRead extends Profile {
@@ -27,12 +35,13 @@ export function withdrawAccount() {
   return apiRequest<{ message: string }>('/users/me', { method: 'DELETE' });
 }
 
-export function updateProfile(name: string, nickname?: string) {
+export function updateProfile(name: string, nickname?: string, parent: ParentProfileInput = {}) {
   return apiRequest<Profile>("/users/me", {
     method: "PATCH",
     body: JSON.stringify({
       name: name.trim(),
-      ...(nickname === undefined ? {} : { nickname }),
+      ...(nickname === undefined ? {} : { nickname: nickname.trim() }),
+      ...parent,
     }),
   });
 }

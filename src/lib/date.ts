@@ -4,6 +4,16 @@ const seoulDateTime = new Intl.DateTimeFormat('ko-KR', {
   timeStyle: 'short',
 });
 
+// 월말은 대상 월의 마지막 날로 보정하며, 조회 기준 날짜는 항상 한국 날짜입니다.
+export function orderSinceDate(months: number, now = new Date()): string {
+  const parts = new Intl.DateTimeFormat('en', { timeZone: 'Asia/Seoul', year: 'numeric', month: 'numeric', day: 'numeric' }).formatToParts(now);
+  const part = (type: string) => Number(parts.find(p => p.type === type)?.value);
+  const target = new Date(Date.UTC(part('year'), part('month') - 1 - months, 1));
+  const lastDay = new Date(Date.UTC(target.getUTCFullYear(), target.getUTCMonth() + 1, 0)).getUTCDate();
+  target.setUTCDate(Math.min(part('day'), lastDay));
+  return target.toISOString().slice(0, 10);
+}
+
 // API 시각은 UTC(Z) 또는 명시적 오프셋이 있어야 합니다. PC 시간대에 맡기지 않습니다.
 export function formatServerDateTime(value: string): string {
   if (!/(Z|[+-]\d{2}:\d{2})$/i.test(value)) return '시간 확인 필요';
@@ -27,6 +37,12 @@ export function formatBirthDate(value: string): string {
 // 생년월일을 한국 날짜 기준 월령으로 계산합니다. UTC 자정 전후에도 기준이 같습니다.
 export function childAgeLabel(birthDate: string, now = new Date()): string {
   if (formatBirthDate(birthDate) === '날짜 확인 필요') return '날짜 확인 필요';
+  const months = childAgeMonths(birthDate, now);
+  const lower = Math.floor(months / 6) * 6;
+  return `만 ${Math.floor(months / 12)}세 · ${lower}~${lower + 5}개월`;
+}
+
+export function childAgeMonths(birthDate: string, now = new Date()): number {
   const parts = new Intl.DateTimeFormat('en', {
     timeZone: 'Asia/Seoul',
     year: 'numeric',
@@ -43,6 +59,5 @@ export function childAgeLabel(birthDate: string, now = new Date()): string {
       month -
       (value('day') < day ? 1 : 0),
   );
-  const lower = Math.floor(months / 6) * 6;
-  return `만 ${Math.floor(months / 12)}세 · ${lower}~${lower + 5}개월`;
+  return months;
 }

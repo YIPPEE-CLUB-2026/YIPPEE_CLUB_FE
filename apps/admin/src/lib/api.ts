@@ -119,7 +119,7 @@ async function renew(): Promise<Tokens> {
 
 export async function apiRequest<T>(
   path: string,
-  options: RequestInit & { accessToken?: string } = {},
+  options: RequestInit & { accessToken?: string; responseType?: 'blob' } = {},
 ): Promise<T> {
   if (isUiPreview) {
     if (options.method && options.method !== "GET") {
@@ -131,9 +131,9 @@ export async function apiRequest<T>(
   const publicAuth = route.startsWith("/auth/");
   const previous = readTokens();
 
-  const { accessToken, ...init } = options;
+  const { accessToken, responseType, ...init } = options;
   const headers = new Headers(init.headers);
-  headers.set("Accept", "application/json");
+  headers.set("Accept", responseType === 'blob' ? '*/*' : 'application/json');
   if (init.body && !(init.body instanceof FormData))
     headers.set("Content-Type", "application/json");
   const token =
@@ -156,6 +156,7 @@ export async function apiRequest<T>(
     if (response.status === 401) expireSession(renewed);
   }
   if (response.status === 204) return undefined as T;
+  if (response.ok && responseType === 'blob') return await response.blob() as T;
   const isJson = response.headers.get("content-type")?.includes("json");
   const data = isJson ? await response.json() : null;
   const responseText = !isJson && !response.ok ? await response.text() : "";

@@ -17,6 +17,9 @@ export interface CatalogProps {
   activities: Activity[];
   savedIds: number[];
   onToggle: (id: number) => void | Promise<void>;
+  savedLoading?: boolean;
+  savedError?: string;
+  onRetrySaved?: () => void;
 }
 
 export function TrendingKeywords({

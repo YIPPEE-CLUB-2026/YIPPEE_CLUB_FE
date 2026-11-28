@@ -1,17 +1,13 @@
 import type { Activity } from '../types';
 import { categoryMatches } from './categories';
+import { childAgeMonths } from './date';
 export function recommendActivities(
   items: Activity[],
   child?: { birth_date: string; interests: number[] },
   today = new Date(),
 ): Activity[] {
   if (!child) return items.slice(0, 20);
-  const birth = new Date(`${child.birth_date}T00:00:00`);
-  const months =
-    (today.getFullYear() - birth.getFullYear()) * 12 +
-    today.getMonth() -
-    birth.getMonth() -
-    (today.getDate() < birth.getDate() ? 1 : 0);
+  const months = childAgeMonths(child.birth_date, today);
   return items
     .filter((item) =>
       item.ageMinMonths !== undefined && item.ageMaxMonths !== undefined

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from 'react';
 import { ApiError } from '../lib/api';
+import { AdminMedia } from './AdminMedia';
 import { errorMessage } from '../lib/admin';
 import { deleteActivityPreviews, getActivityPreviews, replaceActivityPreviews, validatePreviewFiles } from '../lib/previews';
 
@@ -23,7 +24,7 @@ export default function ActivityPreviews({ id }: { id: number }) {
       .then(result => { if (!controller.signal.aborted) setUrls(result.preview_urls); })
       .catch(cause => {
         if (!controller.signal.aborted) setError(cause instanceof ApiError && cause.status === 404
-          ? '비공개 학습지이거나 존재하지 않아 기존 미리보기를 조회할 수 없습니다. ID를 확인한 뒤 등록·교체 또는 전체 삭제할 수 있습니다.'
+          ? '학습지를 찾을 수 없습니다. 학습지 ID를 확인해 주세요.'
           : errorMessage(cause));
       }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
@@ -37,8 +38,9 @@ export default function ActivityPreviews({ id }: { id: number }) {
     if (pending.current || !confirmation) return;
     pending.current = true; setBusy(true); setError(''); setMessage('');
     try {
-      const result = confirmation === 'delete' ? await deleteActivityPreviews(id) : await replaceActivityPreviews(id, files);
-      setUrls(result.preview_urls); setFiles([]);
+      if (confirmation === 'delete') await deleteActivityPreviews(id);
+      else await replaceActivityPreviews(id, files);
+      setAttempt(value => value + 1); setFiles([]);
       if (input.current) input.current.value = '';
       setMessage(confirmation === 'delete' ? '미리보기를 모두 삭제했습니다.' : '미리보기를 저장했습니다.');
       setConfirmation(undefined);
@@ -48,7 +50,7 @@ export default function ActivityPreviews({ id }: { id: number }) {
   return <section className="activity-previews" aria-labelledby="activity-previews-title">
     <h3 id="activity-previews-title">구매 전 미리보기 이미지</h3>
     <p>원본 PDF·표지와 별도로 저장합니다. PNG·JPEG·WEBP, 최대 5장, 각 5MB 이하입니다. 공개 학습지의 미리보기는 구매 전에도 볼 수 있습니다.</p>
-    {loading ? <p role="status">기존 미리보기를 불러오는 중…</p> : urls && (urls.length ? <ol className="preview-image-list">{urls.map((url, index) => <li key={url}><img src={url} alt={`현재 미리보기 ${index + 1}`} /><span>{index + 1}번</span></li>)}</ol> : <p>등록된 미리보기가 없습니다.</p>)}
+    {loading ? <p role="status">기존 미리보기를 불러오는 중…</p> : urls && (urls.length ? <ol className="preview-image-list">{urls.map((url, index) => <li key={url}><AdminMedia path={url} alt={`현재 미리보기 ${index + 1}`} /><span>{index + 1}번</span></li>)}</ol> : <p>등록된 미리보기가 없습니다.</p>)}
     {error && <p className="notice error" role="alert">{error} <button type="button" disabled={busy} onClick={() => setAttempt(value => value + 1)}>다시 조회</button></p>}
     {message && <p role="status">{message}</p>}
     <fieldset disabled={busy}>

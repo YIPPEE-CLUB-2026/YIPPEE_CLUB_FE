@@ -22,6 +22,11 @@ export interface Product {
   image: string;
   pdf: string;
   is_public?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  admin_image?: string;
+  admin_pdf?: string;
+  admin_preview_urls?: string[];
 }
 export interface Download {
   activity_id: number;
